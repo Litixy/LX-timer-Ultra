@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d0f12">
+<title>LX Timer Ultra</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='13' fill='%2317130d'/%3E%3Ccircle cx='20' cy='21' r='11.5' fill='none' stroke='%23f59e0b' stroke-width='2.7'/%3E%3Cpath d='M20 21V14.8M20 21L25 24M16 6.5h8M20 6.5v3M28.8 11.8l2-2' stroke='%23f59e0b' stroke-width='2.7' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --accent:#f59e0b;
+  --accent-rgb:245,158,11;
+  --bg:#17130d;
+  --bg-2:#0f0d0a;
+  --panel:rgba(37,30,21,.88);
+  --panel-2:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.075);
+  --text:#f5f7fa;
+  --muted:#8e949f;
+  --muted-2:#5f6671;
+  --danger:#ff6b6b;
+  --success:#42d392;
+  --shadow:0 20px 60px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+body{overflow-x:hidden;transition:background .25s ease,color .2s ease}
+select{color-scheme:dark}
+select option{background:#181b21;color:#f5f7fa}
+.settings-row select,.field select{appearance:auto;-webkit-appearance:auto}
+input[type=range]{appearance:none;-webkit-appearance:none;width:100%;height:18px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:999px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent) var(--range-pct,80%),rgba(255,255,255,.11) var(--range-pct,80%),rgba(255,255,255,.11) 100%)}
+input[type=range]::-moz-range-track{height:5px;border-radius:999px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent) var(--range-pct,80%),rgba(255,255,255,.11) var(--range-pct,80%),rgba(255,255,255,.11) 100%)}
+input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;margin-top:-5.5px;background:#fff;border:2px solid var(--accent);box-shadow:0 2px 9px rgba(0,0,0,.3)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 2px 9px rgba(0,0,0,.3)}
+button,input,select{font:inherit;color:inherit}
+button{border:0;cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.45}
+input,select{outline:none}
+
+body::before{
+  content:"";position:fixed;inset:-18% -8% auto -8%;height:78vh;pointer-events:none;
+  background:radial-gradient(circle at 18% 12%,rgba(var(--accent-rgb),.22),transparent 38%),
+             radial-gradient(circle at 78% 8%,rgba(var(--accent-rgb),.09),transparent 28%),
+             radial-gradient(circle at 50% 90%,rgba(255,255,255,.025),transparent 34%);
+  z-index:-1
+}
+
+.app{min-height:100vh;display:flex}
+.sidebar{position:fixed;left:16px;top:16px;bottom:16px;width:248px;padding:16px;z-index:20}
+.sidebar-card,.topbar,.panel,.bottom-nav,.modal-card,.toast{background:var(--panel);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.sidebar-card{height:100%;border-radius:28px;padding:12px;display:flex;flex-direction:column}
+.brand{padding:12px 12px 24px;display:flex;align-items:center;gap:12px}
+.brand-mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(var(--accent-rgb),.22),rgba(var(--accent-rgb),.08));color:var(--accent);border:1px solid rgba(var(--accent-rgb),.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 26px rgba(var(--accent-rgb),.12)}
+.logo-svg{width:27px;height:27px;display:block;filter:drop-shadow(0 2px 5px rgba(var(--accent-rgb),.18))}
+.brand-title{font-weight:700;letter-spacing:-.03em}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:11px 11px;border-radius:15px;background:transparent;color:var(--muted);transition:.16s ease;white-space:nowrap;overflow:visible;min-width:0}
+.nav-label{display:block;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:visible;text-overflow:clip;line-height:1.2;font-size:13px;letter-spacing:-.015em}
+.nav-btn:hover{background:rgba(255,255,255,.04);color:#fff}
+.nav-btn.active{background:rgba(var(--accent-rgb),.12);color:#fff}
+.nav-icon{width:24px;height:24px;display:grid;place-items:center;color:var(--accent);flex:0 0 24px}
+.nav-icon svg{width:21px;height:21px;display:block}
+.sidebar-bottom{margin-top:auto;padding:8px 4px 2px}
+.secondary-btn{width:100%;padding:11px 12px;border-radius:14px;background:var(--panel-2);color:var(--muted)}
+.secondary-btn:hover{background:rgba(255,255,255,.07);color:#fff}
+
+.main{margin-left:280px;width:calc(100% - 280px);min-height:100vh;padding:16px 24px 32px}
+.topbar{min-height:70px;border-radius:24px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;position:sticky;top:16px;z-index:10}
+.page-kicker{font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.page-title{font-size:22px;font-weight:700;letter-spacing:-.035em;margin-top:2px}
+.clock{display:flex;align-items:flex-end;gap:9px;white-space:nowrap}
+.clock-time{font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;letter-spacing:-.03em}
+.clock-zone{font-size:11px;color:var(--muted);padding-bottom:3px;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.view{max-width:1100px;margin:18px auto 0;display:none}
+.view.active{display:block}
+.panel{border-radius:32px;padding:28px}
+.hero{min-height:640px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;overflow:hidden}
+.mode-line{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:25px}
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:7px 11px;border-radius:999px;background:rgba(var(--accent-rgb),.11);color:var(--accent);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.subtle{color:var(--muted);font-size:12px}
+.timer-display{font-variant-numeric:tabular-nums;font-size:clamp(5rem,12vw,10.5rem);font-weight:300;letter-spacing:-.07em;line-height:.9}
+.stopwatch-laps{font-variant-numeric:tabular-nums}
+@media(min-width:901px){#stopwatchDisplay{font-size:clamp(4.5rem,10vw,9rem)}}
+@media(max-width:560px){#stopwatchDisplay{font-size:clamp(3.4rem,19vw,6.5rem);letter-spacing:-.06em}}
+.timer-label{font-size:14px;color:var(--muted);margin-top:18px;min-height:20px}
+.primary-actions{display:flex;align-items:center;gap:12px;justify-content:center;margin-top:34px;flex-wrap:wrap}
+.primary{min-width:150px;padding:15px 24px;border-radius:999px;background:var(--accent);color:#111;font-weight:700;box-shadow:0 10px 30px rgba(var(--accent-rgb),.24);transition:.15s ease}
+.primary:hover{transform:translateY(-1px);filter:brightness(1.04)}
+.primary:active{transform:scale(.98)}
+.ghost{padding:13px 18px;border-radius:999px;background:var(--panel-2);border:1px solid var(--border);color:var(--text)}
+.ghost:hover{background:rgba(255,255,255,.08)}
+.quick-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;width:min(820px,100%);margin-top:38px}
+.quick{padding:12px 8px;border-radius:16px;background:var(--panel-2);border:1px solid var(--border);color:var(--text);transition:.15s ease}
+.quick:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.2)}
+
+.editor{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:min(650px,100%);margin-top:26px}
+.field{display:flex;flex-direction:column;gap:7px;text-align:left}
+.field label{font-size:11px;color:var(--muted)}
+.field input,.field select,.settings-row input,.settings-row select{width:100%;border:1px solid var(--border);background:var(--panel-2);border-radius:16px;padding:12px 14px}
+.field input:focus,.field select:focus,.settings-row input:focus,.settings-row select:focus{border-color:rgba(var(--accent-rgb),.45);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.10)}
+
+.split{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+.center-card{min-height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.interval-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:min(700px,100%);margin-top:28px}
+.stat{border:1px solid var(--border);background:var(--panel-2);border-radius:22px;padding:18px;text-align:left}
+.stat-k{font-size:11px;color:var(--muted)}
+#intervalStat{font-size:18px;letter-spacing:.04em}
+.stat-v{font-size:20px;font-weight:600;margin-top:6px;font-variant-numeric:tabular-nums}
+
+.stopwatch-laps{margin-top:24px;width:min(520px,100%);max-height:180px;overflow:auto;border-top:1px solid var(--border)}
+.lap{display:flex;justify-content:space-between;padding:11px 2px;border-bottom:1px solid rgba(255,255,255,.05);font-variant-numeric:tabular-nums;font-size:13px}
+
+.clock-page{min-height:560px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.clock-big{font-size:clamp(4.3rem,11vw,9rem);font-weight:300;letter-spacing:-.07em;font-variant-numeric:tabular-nums}
+.clock-date{font-size:15px;color:var(--muted);margin-top:16px}
+.clock-location{margin-top:8px;color:var(--accent);font-size:12px}
+
+.small-note{font-size:11px;color:var(--muted-2);margin-top:18px}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:20px;z-index:50;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal-backdrop.show{display:flex}
+.modal-card{width:min(560px,100%);max-height:calc(100svh - 32px);overflow:auto;border-radius:28px;padding:24px}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.modal-title{font-size:20px;font-weight:700}
+.close{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.05);color:var(--muted);font-size:20px}
+.settings-list{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+.settings-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,240px);gap:14px;align-items:center;padding:14px 0;border-top:1px solid rgba(255,255,255,.05)}
+.settings-row:first-child{border-top:0;padding-top:0}
+.settings-title{font-size:13px}
+.settings-desc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
+.range-wrap{display:flex;align-items:center;gap:10px;min-width:0}
+.range-wrap input{flex:1}
+.range-val{width:42px;text-align:right;font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,18px);opacity:0;pointer-events:none;padding:12px 16px;border-radius:16px;display:flex;align-items:center;gap:10px;z-index:80;transition:.2s ease}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+.bottom-nav{display:none}
+
+@media(max-width:900px){
+  .sidebar{display:none}
+  .main{margin-left:0;width:100%;padding:12px 12px 98px}
+  .topbar{top:12px}
+  .view{margin-top:14px}
+  .bottom-nav{position:fixed;display:flex;align-items:stretch;left:10px;right:10px;bottom:10px;padding:8px;gap:4px;border-radius:22px;z-index:30;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .bottom-nav::-webkit-scrollbar{display:none}
+  .bottom-btn{background:transparent;color:var(--muted);padding:9px 8px;border-radius:16px;font-size:9px;line-height:1;display:flex;flex:0 0 78px;flex-direction:column;align-items:center;justify-content:center;gap:5px;white-space:nowrap;min-width:78px;letter-spacing:-.02em;overflow:hidden}
+.bottom-label{display:block;min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
+  .bottom-btn.active{background:rgba(var(--accent-rgb),.11);color:#fff}
+  .bottom-btn .bottom-icon{width:18px;height:18px;display:grid;place-items:center;color:var(--accent);line-height:1}.bottom-btn .bottom-icon svg{width:18px;height:18px;display:block}
+  .split{grid-template-columns:1fr}
+  .quick-grid{grid-template-columns:repeat(3,1fr)}
+  .hero,.center-card,.clock-page{min-height:calc(100svh - 160px)}
+}
+@media(max-width:560px){
+  .topbar{padding:9px 11px;border-radius:20px;min-height:58px;gap:10px;flex-wrap:nowrap}
+  .topbar > div:first-child{min-width:0;flex:1 1 auto}
+  .topbar .page-kicker{font-size:9px;letter-spacing:.11em;white-space:nowrap}
+  .page-title{font-size:18px;white-space:nowrap}
+  .top-tools{flex:0 0 auto;display:flex;align-items:center;gap:5px;min-width:0}
+  .clock{gap:6px;flex:0 0 auto}
+  .clock-time{font-size:17px}
+  .clock-zone{display:none}
+  .bottom-btn{font-size:8.5px;padding-inline:4px;flex-basis:74px;min-width:74px}
+  .bottom-nav{gap:2px;padding:7px}
+  .panel{padding:20px;border-radius:26px}
+  .editor{grid-template-columns:1fr 1fr}
+  .editor .field:first-child{grid-column:1/-1}
+  .timer-display{font-size:clamp(4.5rem,24vw,7rem)}
+  .clock-big{font-size:clamp(4rem,21vw,7rem)}
+  .interval-grid{grid-template-columns:1fr 1fr}
+  .settings-row{grid-template-columns:1fr}
+  .settings-row select,.settings-row .range-wrap,.settings-row button{width:100%}
+}
+@media(max-width:380px){
+  .bottom-btn{font-size:8px}
+  .quick{font-size:12px}
+  .primary{min-width:138px}
+}
+
+/* ===== Phase 3: Multiple Timers ===== */
+.multi-page{min-height:560px}
+.multi-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.multi-title{font-size:28px;font-weight:760;letter-spacing:-.04em;margin-top:4px}
+.multi-desc{max-width:720px;color:var(--muted);font-size:12px;line-height:1.6;margin-top:8px}
+.multi-head-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.multi-builder{margin-top:22px;padding:18px;border-radius:22px;background:var(--panel-2);border:1px solid var(--border)}
+.multi-builder-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(130px,.55fr) auto;gap:10px;align-items:end}
+.multi-add-btn{height:48px;white-space:nowrap}
+.multi-quick{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:10px}
+.multi-summary{display:flex;gap:10px;margin-top:18px}
+.multi-summary>div{padding:12px 16px;border-radius:18px;background:var(--panel-2);border:1px solid var(--border);display:flex;align-items:baseline;gap:9px}
+.multi-summary-k{font-size:10px;color:var(--muted)}
+.multi-summary-v{font-size:20px;font-weight:750;font-variant-numeric:tabular-nums}
+.multi-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.multi-empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:22px}
+.multi-card{position:relative;padding:18px;border-radius:22px;background:var(--panel-2);border:1px solid var(--border);min-width:0}
+.multi-card.running{border-color:rgba(var(--accent-rgb),.35);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.08) inset}
+.multi-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.multi-card-name{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.multi-card-state{font-size:10px;color:var(--muted);padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.06);white-space:nowrap}
+.multi-card.running .multi-card-state{color:var(--accent);background:rgba(var(--accent-rgb),.1)}
+.multi-time{font-size:clamp(2.7rem,6vw,4.5rem);font-weight:350;letter-spacing:-.06em;font-variant-numeric:tabular-nums;margin-top:8px;line-height:1}
+.multi-progress{height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:14px}
+.multi-progress>div{height:100%;width:0;background:var(--accent);border-radius:inherit;transition:width .2s linear}
+.multi-meta{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:10px;color:var(--muted)}
+.multi-controls{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.multi-controls button{padding:10px 12px;border-radius:14px;background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:11px}
+.multi-controls button:hover{background:rgba(var(--accent-rgb),.08)}
+.multi-controls .multi-danger{color:#ff8b8b}
+.multi-card-inputs{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05)}
+.multi-card-inputs .field input{padding:10px 12px;border-radius:14px}
+@media(max-width:900px){
+  .multi-head{flex-direction:column}
+  .multi-head-actions{width:100%;justify-content:stretch}
+  .multi-head-actions button{flex:1}
+  .multi-list{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .multi-title{font-size:23px}
+  .multi-builder-grid{grid-template-columns:1fr 1fr}
+  .multi-name-field{grid-column:1/-1}
+  .multi-add-btn{grid-column:1/-1}
+  .multi-quick{grid-template-columns:repeat(3,1fr)}
+  .multi-summary{display:grid;grid-template-columns:1fr 1fr}
+  .multi-summary>div{justify-content:space-between}
+}
+
+/* ===== Stage 2 enhancements ===== */
+.favorite-wrap{width:min(820px,100%);margin-top:16px;text-align:left}
+.favorite-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.favorite-title{font-size:11px;color:var(--muted);letter-spacing:.06em}
+.favorite-list{display:flex;gap:8px;flex-wrap:wrap}
+.favorite{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:15px;background:var(--panel-2);border:1px solid var(--border);color:var(--text)}
+.favorite:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.22)}
+.favorite .fav-name{font-size:12px}
+.favorite .fav-time{font-size:11px;color:var(--muted)}
+.favorite .fav-delete{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.06);color:var(--muted);font-size:12px;line-height:1}
+.save-inline{padding:12px 15px;border-radius:16px;background:rgba(var(--accent-rgb),.11);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.18);white-space:nowrap}
+.editor-actions{display:flex;justify-content:center;gap:9px;margin-top:10px;flex-wrap:wrap}
+.sound-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.range-wrap{display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:10px;align-items:center}
+.range-val{text-align:right;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.world-clocks{width:min(900px,100%);margin-top:34px;text-align:left}
+.world-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.world-title{font-size:13px;font-weight:650}
+.world-add{display:flex;gap:8px;align-items:center}
+.world-add select{min-width:210px}
+.world-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.world-card{padding:15px 16px;border-radius:20px;background:var(--panel-2);border:1px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+.world-name{font-size:13px;font-weight:650}
+.world-zone{font-size:10px;color:var(--muted);margin-top:3px}
+.world-time{font-size:25px;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.world-remove{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);color:var(--muted)}
+.setting-subgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:12px 14px;border-radius:16px;background:var(--panel-2);border:1px solid var(--border)}
+.toggle-pill{width:42px;height:24px;border-radius:999px;background:rgba(255,255,255,.12);padding:3px;display:flex;justify-content:flex-start;transition:.2s}
+.toggle-pill::after{content:"";width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.toggle-btn.on .toggle-pill{background:var(--accent)}
+.toggle-btn.on .toggle-pill{justify-content:flex-end}
+@media (max-width:900px){
+  .world-list{grid-template-columns:1fr}
+  .setting-subgrid{grid-template-columns:1fr}
+  .world-add{width:100%;flex-direction:column;align-items:stretch}
+  .world-add select{min-width:0;width:100%}
+}
+@media (max-width:640px){
+  .favorite-wrap{margin-top:12px}
+  .world-clocks{margin-top:24px}
+}
+
+
+.top-tools{display:flex;align-items:center;gap:8px;min-width:0}.top-tool{display:inline-flex;align-items:center;gap:6px;padding:9px 11px;border-radius:13px;background:var(--panel-2);border:1px solid var(--border);color:var(--muted);white-space:nowrap}.top-tool:hover{color:var(--text);background:rgba(var(--accent-rgb),.08)}
+.history-card{width:min(760px,100%)}.stat-grid.analytics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px}.analysis-block{margin-top:22px;padding-top:20px;border-top:1px solid var(--border)}.analysis-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.small-btn{padding:9px 12px;font-size:11px}.weekly-chart{margin-top:16px;height:150px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end}.day-bar{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px;min-width:0}.day-fill{width:100%;max-width:36px;min-height:3px;height:var(--bar-h);border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,var(--accent),rgba(var(--accent-rgb),.36));box-shadow:0 8px 22px rgba(var(--accent-rgb),.10)}.day-value{font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}.day-label{font-size:9px;color:var(--muted)}.history-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}.history-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 13px;border-radius:16px;background:var(--panel-2);border:1px solid rgba(255,255,255,.04)}.history-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.10);color:var(--accent)}.history-name{font-size:12px;font-weight:650}.history-meta{font-size:10px;color:var(--muted);margin-top:3px}.history-time{font-size:13px;font-variant-numeric:tabular-nums}.empty-history{padding:28px 8px;text-align:center;color:var(--muted);font-size:12px}.complete-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.48);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:80}.complete-overlay.show{display:flex;animation:fadeIn .18s ease}.complete-card{position:relative;width:min(420px,100%);padding:34px 28px 30px;border-radius:30px;background:var(--panel);border:1px solid var(--border);box-shadow:0 30px 90px rgba(0,0,0,.4);text-align:center;overflow:hidden;animation:completePop .42s cubic-bezier(.2,.85,.25,1)}.complete-glow{position:absolute;inset:-30% 10% auto;height:220px;background:radial-gradient(circle,rgba(var(--accent-rgb),.24),transparent 68%);pointer-events:none}.complete-ring{position:relative;width:84px;height:84px;border-radius:50%;margin:0 auto 18px;border:2px solid rgba(var(--accent-rgb),.42);display:grid;place-items:center;color:var(--accent);box-shadow:0 0 0 10px rgba(var(--accent-rgb),.05),0 0 40px rgba(var(--accent-rgb),.18);animation:completeRing .65s ease-out}.complete-ring span{font-size:38px;font-weight:700;line-height:1}.complete-kicker{font-size:10px;letter-spacing:.16em;color:var(--muted)}.complete-title{font-size:26px;font-weight:750;letter-spacing:-.03em;margin-top:7px}.complete-sub{font-size:12px;color:var(--muted);margin:8px 0 22px}@keyframes completePop{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}@keyframes completeRing{from{transform:scale(.65) rotate(-15deg);opacity:.2}to{transform:scale(1) rotate(0);opacity:1}}
+.focus-mode .sidebar,.focus-mode .topbar,.focus-mode .bottom-nav{display:none!important}.focus-mode .main{margin-left:0;width:100%;padding:16px}.focus-mode .view{max-width:none;margin:0}.focus-mode .panel{min-height:calc(100svh - 32px);border-radius:28px}.focus-mode .hero,.focus-mode .center-card,.focus-mode .clock-page{min-height:calc(100svh - 32px)}.focus-mode .timer-display,.focus-mode .clock-big{font-size:clamp(6rem,18vw,15rem)}
+.light-mode select option{background:#fff;color:#15181d}
+@media(max-width:900px){.stat-grid.analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.top-tools{gap:5px}.top-tool span{display:none}.top-tool{width:40px;height:40px;justify-content:center;padding:0}.clock-zone{max-width:140px}}
+@media(max-width:640px){.analysis-head{flex-direction:column}.history-item{grid-template-columns:auto minmax(0,1fr)}.history-time{grid-column:2}.complete-card{padding:30px 20px}.weekly-chart{height:128px;gap:5px}.focus-mode .main{padding:10px}.focus-mode .panel,.focus-mode .hero,.focus-mode .center-card,.focus-mode .clock-page{min-height:calc(100svh - 20px)}}
+
+/* ===== Phase 2: Time Stack + in-app input UI ===== */
+.stack-page{min-height:620px;display:flex;flex-direction:column;align-items:stretch}
+.stack-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.stack-title{font-size:22px;font-weight:750;letter-spacing:-.035em}
+.stack-desc{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.55}
+.stack-builder{margin-top:24px;padding:16px;border:1px solid var(--border);background:var(--panel-2);border-radius:24px}
+.stack-builder-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(120px,.7fr) auto;gap:10px;align-items:end}
+.stack-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.stack-input{width:100%;border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:15px;padding:12px 14px;min-height:46px}
+.stack-input:focus{border-color:rgba(var(--accent-rgb),.45);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.10)}
+.stack-list{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+.stack-empty{padding:24px;text-align:center;border:1px dashed var(--border);border-radius:20px;color:var(--muted);font-size:12px}
+.stack-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 13px;border-radius:18px;border:1px solid var(--border);background:var(--panel-2)}
+.stack-index{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.10);color:var(--accent);font-size:11px;font-variant-numeric:tabular-nums}
+.stack-item-name{font-size:13px;font-weight:650}
+.stack-item-meta{font-size:10px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+.stack-item-actions{display:flex;gap:5px}
+.stack-mini{width:31px;height:31px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);font-size:12px}
+.stack-mini:hover{color:var(--text);background:rgba(var(--accent-rgb),.08)}
+.stack-mini.edit{color:var(--accent)}
+.stack-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.stack-total{font-size:12px;color:var(--muted)}
+.stack-runtime{margin-top:18px;border:1px solid rgba(var(--accent-rgb),.22);background:rgba(var(--accent-rgb),.06);border-radius:24px;padding:18px}
+.stack-runtime-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stack-runtime-kicker{font-size:10px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+.stack-runtime-name{font-size:18px;font-weight:700;margin-top:5px}
+.stack-runtime-time{font-size:clamp(3.1rem,8vw,6rem);font-weight:300;letter-spacing:-.07em;line-height:.9;font-variant-numeric:tabular-nums;text-align:center;margin:22px 0 16px}
+.stack-runtime-progress{height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.stack-runtime-progress > div{height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .25s ease}
+.stack-runtime-controls{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:18px}
+.stack-current-meta{text-align:center;color:var(--muted);font-size:11px;margin-top:9px}
+.stack-total-time{font-variant-numeric:tabular-nums}
+.text-modal-card{width:min(460px,100%)}
+.text-modal-actions,.confirm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.text-modal-actions .primary,.text-modal-actions .ghost,.confirm-actions .primary,.confirm-actions .ghost{min-width:100px}
+.numpad-backdrop{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:120;padding:12px}
+.numpad-backdrop.show{display:flex}
+.numpad-card{width:min(430px,100%);padding:14px;border-radius:28px;background:var(--panel);border:1px solid var(--border);box-shadow:0 28px 80px rgba(0,0,0,.4);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.numpad-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.numpad-title{font-size:12px;color:var(--muted)}
+.numpad-value{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.numpad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.numpad-key{min-height:58px;border-radius:17px;background:var(--panel-2);border:1px solid var(--border);font-size:20px;font-weight:650}
+.numpad-key:active{transform:scale(.98);background:rgba(var(--accent-rgb),.10)}
+.numpad-key.utility{font-size:13px;color:var(--muted)}
+.numpad-key.done{background:var(--accent);color:#111;border-color:transparent}
+.numpad-foot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.numpad-foot .numpad-key{min-height:48px}
+@media(max-width:900px){
+  .stack-builder-grid{grid-template-columns:1fr 1fr}
+  .stack-builder-grid .stack-name-field{grid-column:1/-1}
+  .stack-builder-grid .stack-add-btn{grid-column:1/-1;width:100%}
+}
+@media(max-width:560px){
+  .stack-page{min-height:calc(100svh - 160px)}
+  .stack-head{flex-direction:column}
+  .stack-runtime-top{align-items:flex-start}
+  .stack-runtime-time{font-size:clamp(3rem,19vw,5.8rem)}
+  .stack-item{grid-template-columns:auto minmax(0,1fr)}
+  .stack-item-actions{grid-column:2;justify-content:flex-start}
+}
+
+
+/* ===== Phase 4: Smart Timer ===== */
+.smart-page{min-height:620px}
+.smart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.smart-title{font-size:clamp(30px,4vw,44px);font-weight:700;letter-spacing:-.05em;margin-top:6px}
+.smart-desc{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.7;max-width:700px}
+.smart-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(520px,100%);margin:26px auto 0}
+.smart-tab{padding:13px 14px;border-radius:16px;background:var(--panel-2);border:1px solid var(--border);color:var(--muted);font-weight:700}
+.smart-tab.active{background:rgba(var(--accent-rgb),.12);color:var(--text);border-color:rgba(var(--accent-rgb),.22)}
+.smart-card{margin-top:18px;border:1px solid var(--border);background:var(--panel-2);border-radius:24px;padding:20px}
+.smart-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.smart-time-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.smart-time-inputs.two{grid-template-columns:1fr 1fr;max-width:340px}
+.smart-unit{position:relative}
+.smart-unit::after{content:'分';position:absolute;right:13px;bottom:12px;color:var(--muted);font-size:12px;pointer-events:none}
+.smart-clock-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:340px}
+.smart-big-time{font-variant-numeric:tabular-nums;font-size:clamp(3.4rem,8vw,6.8rem);font-weight:300;letter-spacing:-.07em;line-height:.95;text-align:center;margin:28px 0 8px}
+.smart-target{text-align:center;color:var(--muted);font-size:12px;min-height:18px}
+.smart-helper{font-size:11px;color:var(--muted-2);margin-top:10px;line-height:1.6}
+.smart-quick{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px}
+.smart-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.smart-summary .stat{padding:15px}
+.smart-summary .stat-v{font-size:16px}
+.smart-status{margin:18px auto 0;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap}
+.smart-dot{width:8px;height:8px;border-radius:50%;background:var(--muted-2)}
+.smart-dot.on{background:var(--success);box-shadow:0 0 0 5px rgba(66,211,146,.08)}
+.smart-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.smart-actions .primary{min-width:170px}
+.smart-note{font-size:11px;color:var(--muted-2);text-align:center;margin-top:18px}
+@media(max-width:760px){
+  .smart-grid{grid-template-columns:1fr}
+  .smart-quick{grid-template-columns:repeat(3,1fr)}
+  .smart-summary{grid-template-columns:1fr}
+  .smart-head{flex-direction:column}
+}
+@media(max-width:560px){
+  .smart-page{padding:20px}
+  .smart-title{font-size:30px}
+  .smart-big-time{font-size:clamp(3rem,17vw,5rem)}
+  .smart-tab{padding:12px 9px;font-size:12px}
+}
+
+/* ===== Information architecture v2 ===== */
+
+/* ===== Phase 5: Schedules / Routines ===== */
+.automation-page{padding-bottom:30px}.automation-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}.automation-title{font-size:clamp(30px,4vw,44px);font-weight:750;letter-spacing:-.05em;margin-top:6px}.automation-desc{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.7;max-width:740px}.automation-tabs{display:flex;gap:6px;margin-top:24px;padding:5px;border-radius:18px;background:var(--panel-2);border:1px solid var(--border)}.automation-tab{flex:1;padding:11px 14px;border:0;border-radius:14px;background:transparent;color:var(--muted);font-weight:700}.automation-tab.active{background:rgba(var(--accent-rgb),.12);color:var(--text);box-shadow:inset 0 0 0 1px rgba(var(--accent-rgb),.18)}.automation-builder{margin-top:20px;padding:18px;border-radius:24px;background:var(--panel-2);border:1px solid var(--border)}.automation-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}.automation-grid{display:grid;grid-template-columns:minmax(0,1.8fr) .8fr .8fr 1.1fr 1.25fr;gap:10px;align-items:end}.automation-grid .automation-wide{grid-column:span 1}.automation-builder>.primary{margin-top:12px}.schedule-extra{margin-top:10px}.day-picker{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.day-picker button{min-height:44px;border-radius:13px;border:1px solid var(--border);background:var(--panel-2);color:var(--muted);font-weight:700}.day-picker button.active{background:rgba(var(--accent-rgb),.14);color:var(--text);border-color:rgba(var(--accent-rgb),.32)}.automation-list-head{margin-top:24px}.automation-list{display:flex;flex-direction:column;gap:9px;margin-top:12px}.schedule-card,.routine-card{padding:16px;border-radius:20px;border:1px solid var(--border);background:var(--panel-2);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}.automation-card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.automation-name{font-size:13px;font-weight:750}.automation-meta{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.6}.automation-next{font-size:11px;color:var(--text);margin-top:8px}.automation-actions{display:flex;gap:6px;align-items:center}.automation-actions .ghost{padding:9px 11px}.toggle-mini{min-width:54px;padding:8px 10px;border-radius:999px;border:1px solid var(--border);background:var(--panel);color:var(--muted);font-size:11px}.toggle-mini.on{color:var(--text);border-color:rgba(var(--accent-rgb),.34);background:rgba(var(--accent-rgb),.10)}.routine-source-preview{margin-top:12px;padding:11px 12px;border-radius:16px;border:1px dashed var(--border);color:var(--muted);font-size:10px;line-height:1.6}.routine-create-grid{grid-template-columns:minmax(0,1.8fr) 1fr}.routine-runtime{margin-top:20px;padding:22px;border-radius:24px;background:linear-gradient(180deg,rgba(var(--accent-rgb),.08),var(--panel-2));border:1px solid rgba(var(--accent-rgb),.20)}.routine-runtime-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.routine-runtime-kicker{font-size:9px;letter-spacing:.14em;color:var(--muted)}.routine-runtime-name{font-size:16px;font-weight:750;margin-top:4px}.routine-runtime-block{margin-top:18px;font-size:12px;color:var(--muted)}.routine-runtime-time{font-size:clamp(3rem,8vw,5.5rem);font-variant-numeric:tabular-nums;letter-spacing:-.06em;margin-top:2px}.routine-runtime-progress{height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:12px}.routine-runtime-progress>div{height:100%;width:0;background:var(--accent);box-shadow:0 0 24px rgba(var(--accent-rgb),.4);transition:width .2s linear}.automation-note{margin-top:16px;font-size:10px;color:var(--muted);line-height:1.7}.empty-automation{padding:28px 10px;border:1px dashed var(--border);border-radius:18px;color:var(--muted);text-align:center;font-size:11px}
+@media(max-width:900px){.automation-grid{grid-template-columns:1.2fr .8fr .8fr 1fr}.automation-grid .automation-wide{grid-column:1 / -1}.routine-create-grid{grid-template-columns:1fr}.schedule-card,.routine-card{grid-template-columns:1fr}.automation-actions{justify-content:flex-start;flex-wrap:wrap}}
+@media(max-width:560px){.automation-head{gap:12px}.automation-head>.badge{display:none}.automation-title{font-size:28px}.automation-builder{padding:15px}.automation-section-head{flex-direction:column;gap:6px}.automation-tabs{margin-top:18px}.automation-tab{padding:10px 8px;font-size:11px}.day-picker{gap:4px}.day-picker button{min-height:40px}.schedule-card,.routine-card{padding:14px}.automation-actions .ghost,.toggle-mini{padding:8px 10px}.routine-runtime{padding:18px}.routine-runtime-time{font-size:clamp(2.8rem,17vw,4.5rem)}}
+.timer-subnav{display:none;max-width:1100px;margin:14px auto 0;padding:6px;border:1px solid var(--border);background:var(--panel);border-radius:19px;box-shadow:var(--shadow);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);gap:5px;position:sticky;top:98px;z-index:9}
+.timer-subnav.show{display:flex}
+.timer-subbtn{flex:1;padding:10px 12px;border-radius:13px;background:transparent;color:var(--muted);font-size:11px;font-weight:650;white-space:nowrap}
+.timer-subbtn.active{background:rgba(var(--accent-rgb),.12);color:var(--text)}
+.nav-parent{margin-bottom:2px}.nav-chevron{font-size:12px;color:var(--muted);transition:.18s}.nav-btn.active .nav-chevron{transform:rotate(180deg);color:var(--accent)}
+.nav-subnav{display:none;flex-direction:column;gap:3px;padding:0 4px 7px 45px}.nav-subnav.show{display:flex}
+.nav-subbtn{text-align:left;padding:8px 10px;border-radius:11px;background:transparent;color:var(--muted);font-size:11px}.nav-subbtn.active{color:var(--accent);background:rgba(var(--accent-rgb),.07)}
+.home-page{min-height:620px}.home-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}.home-title{font-size:clamp(30px,4vw,44px);font-weight:700;letter-spacing:-.05em;margin-top:6px}.home-desc{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.7;max-width:680px}.home-now{min-width:150px;padding:14px 16px;border:1px solid var(--border);background:var(--panel-2);border-radius:19px;text-align:right}.home-now-label{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}.home-now strong{font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:-.03em}.home-section-title{margin-top:28px;font-size:11px;color:var(--muted);letter-spacing:.09em}.home-running{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}.home-running-card{padding:16px;border-radius:20px;border:1px solid var(--border);background:var(--panel-2);min-width:0}.home-running-card.active{border-color:rgba(var(--accent-rgb),.25);background:rgba(var(--accent-rgb),.055)}.home-running-label{font-size:10px;color:var(--muted)}.home-running-name{font-size:13px;font-weight:700;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.home-running-time{font-size:22px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:8px}.home-running-state{font-size:10px;color:var(--muted);margin-top:6px}.home-quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.home-quick{padding:16px;text-align:left;border-radius:20px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);transition:.16s ease}.home-quick:hover{transform:translateY(-1px);border-color:rgba(var(--accent-rgb),.25);background:rgba(var(--accent-rgb),.07)}.home-quick-kicker{display:block;font-size:9px;letter-spacing:.13em;color:var(--accent)}.home-quick strong{display:block;font-size:13px;margin-top:5px}.home-quick small{display:block;font-size:10px;color:var(--muted);margin-top:5px;line-height:1.4}
+@media(max-width:900px){.timer-subnav{top:82px;margin-top:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.timer-subnav::-webkit-scrollbar{display:none}.home-running{grid-template-columns:repeat(2,minmax(0,1fr))}.home-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nav-subnav{display:none}.nav-parent .nav-chevron{display:none}}
+@media(max-width:560px){.timer-subnav{position:relative;top:auto;margin:10px 0 0;padding:5px;border-radius:17px}.timer-subbtn{flex:0 0 auto;padding:9px 13px;font-size:10px}.home-page{min-height:calc(100svh - 160px)}.home-head{flex-direction:column}.home-now{width:100%;text-align:left;display:flex;align-items:baseline;justify-content:space-between;gap:10px}.home-now-label{margin-bottom:0}.home-now strong{font-size:20px}.home-running{grid-template-columns:1fr 1fr}.home-quick-grid{grid-template-columns:1fr 1fr}.home-quick{padding:14px}.home-quick strong{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="brand">
+        <div class="brand-mark" aria-label="Timer logo">
+          <svg class="logo-svg" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+            <circle cx="20" cy="21" r="11.5" stroke="currentColor" stroke-width="2.7"/>
+            <path d="M20 21V14.8M20 21L25 24" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/>
+            <path d="M16 6.5h8M20 6.5v3" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/>
+            <path d="M28.8 11.8l2-2" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div><div class="brand-title">LX Timer Ultra</div><div class="brand-sub">Advanced time management.</div></div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-root-mode="home"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 11.2 12 5l7.5 6.2v7.3a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.2 19.5v-5.1h5.6v5.1" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><span class="nav-label">ホーム</span></button>
+        <button class="nav-btn nav-parent" data-root-mode="timer"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="13" r="7.4" stroke="currentColor" stroke-width="1.8"/><path d="M12 13V9.3M12 13l3.1 1.9M9.2 3.7h5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="nav-label">タイマー</span><span class="nav-chevron">⌄</span></button>
+        <div class="nav-subnav">
+          <button class="nav-subbtn active" data-timer-submode="timer">通常タイマー</button>
+          <button class="nav-subbtn" data-timer-submode="interval">インターバル</button>
+          <button class="nav-subbtn" data-timer-submode="multi">複数タイマー</button>
+          <button class="nav-subbtn" data-timer-submode="stack">Time Stack</button>
+          <button class="nav-subbtn" data-timer-submode="smart">Smart Timer</button>
+          <button class="nav-subbtn" data-timer-submode="automation">自動化</button>
+        </div>
+        <button class="nav-btn" data-root-mode="stopwatch"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="13" r="7.4" stroke="currentColor" stroke-width="1.8"/><path d="M9.2 3.7h5.6M12 13V9.1M12 13l-2.8 2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.8 5.2l1.5-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="nav-label">ストップウォッチ</span></button>
+        <button class="nav-btn" data-root-mode="clock"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 12V7.7M12 12l3.4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="nav-label">時計</span></button>
+        <button class="nav-btn" data-root-mode="history"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 5.5h14v13H5z" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 9h7M8.5 12h7M8.5 15h4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="nav-label">履歴</span></button>
+      </nav>
+      <div class="sidebar-bottom"><button id="settingsBtn" class="secondary-btn">⚙ 設定</button></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><div class="page-kicker">LX TIMER ULTRA</div><div id="pageTitle" class="page-title">ホーム</div></div>
+      <div class="top-tools"><button id="focusBtn" class="top-tool" type="button">⛶ <span>集中</span></button><div class="clock"><div id="headerClock" class="clock-time">--:--:--</div><div id="headerZone" class="clock-zone">端末（自動）</div></div></div>
+    </header>
+
+    <div id="timerSubnav" class="timer-subnav" aria-label="タイマー機能">
+      <button class="timer-subbtn active" data-timer-submode="timer">通常</button>
+      <button class="timer-subbtn" data-timer-submode="interval">インターバル</button>
+      <button class="timer-subbtn" data-timer-submode="multi">複数</button>
+      <button class="timer-subbtn" data-timer-submode="stack">Stack</button>
+      <button class="timer-subbtn" data-timer-submode="smart">Smart</button>
+      <button class="timer-subbtn" data-timer-submode="automation">自動化</button>
+    </div>
+
+    <section id="view-home" class="view active">
+      <div class="panel home-page">
+        <div class="home-head">
+          <div><div class="page-kicker">OVERVIEW</div><div class="home-title">ホーム</div><div class="home-desc">今動いている時間と、よく使う機能へすぐアクセスできます。</div></div>
+          <div class="home-now"><span class="home-now-label">現在時刻</span><strong id="homeClock">--:--:--</strong></div>
+        </div>
+        <div class="home-section-title">現在の動作</div>
+        <div id="homeRunning" class="home-running"></div>
+        <div class="home-section-title">すぐ使う</div>
+        <div class="home-quick-grid">
+          <button class="home-quick" data-home-target="timer"><span class="home-quick-kicker">TIMER</span><strong>通常タイマー</strong><small>すぐにカウントダウン</small></button>
+          <button class="home-quick" data-home-target="multi"><span class="home-quick-kicker">MULTIPLE</span><strong>複数タイマー</strong><small>複数の時間を同時管理</small></button>
+          <button class="home-quick" data-home-target="stack"><span class="home-quick-kicker">STACK</span><strong>Time Stack</strong><small>時間の流れを組み立てる</small></button>
+          <button class="home-quick" data-home-target="smart"><span class="home-quick-kicker">SMART</span><strong>Smart Timer</strong><small>終了時刻から逆算</small></button>
+          <button class="home-quick" data-home-target="stopwatch"><span class="home-quick-kicker">STOPWATCH</span><strong>ストップウォッチ</strong><small>経過時間を測る</small></button>
+          <button class="home-quick" data-home-target="clock"><span class="home-quick-kicker">CLOCK</span><strong>時計</strong><small>現在時刻と世界時計</small></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-timer" class="view">
+      <div class="panel hero">
+        <div class="mode-line"><span class="badge">COUNTDOWN</span><span id="timerStatus" class="subtle">待機中</span></div>
+        <div id="timerDisplay" class="timer-display">25:00</div>
+        <div id="timerLabel" class="timer-label">タイマー</div>
+        <div class="primary-actions"><button id="timerStart" class="primary">▶ 開始</button><button id="timerReset" class="ghost">↻ リセット</button><button id="timerFocus" class="ghost">⛶ 集中</button></div>
+        <div class="quick-grid">
+          <button class="quick" data-min="1">1分</button><button class="quick" data-min="5">5分</button><button class="quick" data-min="10">10分</button><button class="quick" data-min="15">15分</button><button class="quick" data-min="30">30分</button><button class="quick" data-min="60">60分</button>
+        </div>
+        <div class="editor">
+          <div class="field"><label>時間</label><input id="timerH" class="lx-number" data-numpad="true" type="text" inputmode="none" value="0" autocomplete="off" readonly></div>
+          <div class="field"><label>分</label><input id="timerM" class="lx-number" data-numpad="true" type="text" inputmode="none" value="25" autocomplete="off" readonly></div>
+          <div class="field"><label>秒</label><input id="timerS" class="lx-number" data-numpad="true" type="text" inputmode="none" value="0" autocomplete="off" readonly></div>
+        </div>
+        <div class="editor-actions"><button id="saveFavorite" class="save-inline">＋ お気に入りに保存</button></div>
+        <div class="favorite-wrap">
+          <div class="favorite-head"><div class="favorite-title">お気に入りタイマー</div></div>
+          <div id="favoriteList" class="favorite-list"></div>
+        </div>
+        <div class="small-note">Space：開始 / 一時停止　　R：リセット　　Esc：設定を閉じる</div>
+      </div>
+    </section>
+
+    <section id="view-stopwatch" class="view">
+      <div class="panel center-card">
+        <div class="mode-line"><span class="badge">STOPWATCH</span><span id="stopwatchStatus" class="subtle">待機中</span></div>
+        <div id="stopwatchDisplay" class="timer-display">00:00.00</div>
+        <div class="primary-actions"><button id="stopwatchStart" class="primary">▶ 開始</button><button id="stopwatchLap" class="ghost">＋ ラップ</button><button id="stopwatchStop" class="ghost">■ 終了</button><button id="stopwatchReset" class="ghost">↻ リセット</button><button id="stopwatchFocus" class="ghost">⛶ 集中</button></div>
+        <div class="small-note">長時間計測に対応。時間に上限はありません。</div>
+        <div id="laps" class="stopwatch-laps"></div>
+      </div>
+    </section>
+
+    <section id="view-interval" class="view">
+      <div class="panel center-card">
+        <div class="mode-line"><span id="intervalBadge" class="badge">WORK</span><span id="intervalStatus" class="subtle">待機中</span></div>
+        <div id="intervalDisplay" class="timer-display">25:00</div>
+        <div id="intervalRound" class="timer-label">Round 1 / 4</div>
+        <div class="primary-actions"><button id="intervalStart" class="primary">▶ 開始</button><button id="intervalReset" class="ghost">↻ リセット</button><button id="intervalFocus" class="ghost">⛶ 集中</button></div>
+        <div class="interval-grid">
+          <div class="field"><label>集中（分）</label><input id="workMin" class="lx-number" data-numpad="true" type="text" inputmode="none" value="25" autocomplete="off" readonly></div>
+          <div class="field"><label>休憩（分）</label><input id="breakMin" class="lx-number" data-numpad="true" type="text" inputmode="none" value="5" autocomplete="off" readonly></div>
+          <div class="field"><label>ラウンド数</label><input id="rounds" class="lx-number" data-numpad="true" type="text" inputmode="none" value="4" autocomplete="off" readonly></div>
+          <div class="stat"><div class="stat-k">状態</div><div id="intervalStat" class="stat-v">WORK</div></div>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="view-multi" class="view">
+      <div class="panel multi-page">
+        <div class="multi-head">
+          <div>
+            <div class="page-kicker">MULTIPLE TIMERS</div>
+            <div class="multi-title">複数タイマー</div>
+            <div class="multi-desc">複数のカウントダウンを同時に走らせて、残り時間をひとつの画面で管理します。</div>
+          </div>
+          <div class="multi-head-actions">
+            <button id="multiStartAll" class="primary" type="button">▶ すべて開始</button>
+            <button id="multiPauseAll" class="ghost" type="button">Ⅱ すべて停止</button><button id="multiClearAll" class="ghost" type="button">すべて削除</button>
+          </div>
+        </div>
+
+        <div class="multi-builder">
+          <div class="multi-builder-grid">
+            <div class="field multi-name-field"><label>タイマー名</label><input id="multiName" class="stack-input" type="text" maxlength="40" autocomplete="off" value="タイマー 1" placeholder="例：勉強、洗濯、ゲーム"></div>
+            <div class="field"><label>時間（分）</label><input id="multiMinutes" class="stack-input lx-number" data-numpad="true" type="text" inputmode="none" value="25" autocomplete="off" readonly></div>
+            <button id="multiAdd" class="primary multi-add-btn" type="button">＋ タイマーを追加</button>
+          </div>
+          <div class="small-note" style="margin-top:11px">各タイマーは独立して動作します。スマホでは時間欄をタップするとLX Timer専用の数字パッドが開きます。</div>
+          <div class="multi-quick">
+            <button class="quick multi-preset" data-multi-name="1分タイマー" data-multi-min="1" type="button">1分</button>
+            <button class="quick multi-preset" data-multi-name="5分タイマー" data-multi-min="5" type="button">5分</button>
+            <button class="quick multi-preset" data-multi-name="10分タイマー" data-multi-min="10" type="button">10分</button>
+            <button class="quick multi-preset" data-multi-name="25分タイマー" data-multi-min="25" type="button">25分</button>
+            <button class="quick multi-preset" data-multi-name="50分タイマー" data-multi-min="50" type="button">50分</button>
+            <button class="quick multi-preset" data-multi-name="60分タイマー" data-multi-min="60" type="button">60分</button>
+          </div>
+        </div>
+
+        <div class="multi-summary">
+          <div><span class="multi-summary-k">登録中</span><span id="multiCount" class="multi-summary-v">0</span></div>
+          <div><span class="multi-summary-k">稼働中</span><span id="multiRunningCount" class="multi-summary-v">0</span></div>
+        </div>
+        <div id="multiList" class="multi-list"></div>
+      </div>
+    </section>
+
+    <section id="view-stack" class="view">
+      <div class="panel stack-page">
+        <div class="stack-head">
+          <div>
+            <div class="page-kicker">TIME STACK</div>
+            <div class="stack-title">時間を積み重ねる</div>
+            <div class="stack-desc">「集中 → 休憩 → 集中」のような時間ブロックを並べて、ひとつの流れとして自動実行します。</div>
+          </div>
+          <button id="stackClear" class="ghost" type="button">すべて消去</button>
+        </div>
+
+        <div class="stack-builder">
+          <div class="stack-builder-grid">
+            <div class="field stack-name-field"><label>ブロック名</label><input id="stackName" class="stack-input" type="text" value="集中" maxlength="40" autocomplete="off" placeholder="例：集中、休憩、移動"></div>
+            <div class="field"><label>時間（分）</label><input id="stackMinutes" class="stack-input lx-number" data-numpad="true" type="text" inputmode="none" value="25" autocomplete="off" readonly></div>
+            <button id="stackAdd" class="primary stack-add-btn" type="button">＋ ブロックを追加</button>
+          </div>
+          <div class="small-note" style="margin-top:11px">スマホでは時間欄をタップすると、LX Timer専用の数字パッドで入力できます。</div>
+          <div class="stack-actions">
+            <button class="quick stack-template" data-stack-template="25,5">25分 + 5分</button>
+            <button class="quick stack-template" data-stack-template="50,10">50分 + 10分</button>
+            <button class="quick stack-template" data-stack-template="15,5,15">15 + 5 + 15分</button>
+          </div>
+        </div>
+
+        <div id="stackList" class="stack-list"></div>
+
+        <div class="stack-footer">
+          <div class="stack-total">合計 <span id="stackTotal" class="stack-total-time">00:00</span></div>
+          <button id="stackStart" class="primary" type="button">▶ Stackを開始</button>
+        </div>
+
+        <div id="stackRuntime" class="stack-runtime" hidden>
+          <div class="stack-runtime-top">
+            <div><div class="stack-runtime-kicker">CURRENT BLOCK</div><div id="stackRuntimeName" class="stack-runtime-name">集中</div></div>
+            <span id="stackRuntimePhase" class="badge">1 / 1</span>
+          </div>
+          <div id="stackRuntimeTime" class="stack-runtime-time">25:00</div>
+          <div class="stack-runtime-progress"><div id="stackRuntimeProgress"></div></div>
+          <div id="stackRuntimeMeta" class="stack-current-meta">残り 1ブロック</div>
+          <div class="stack-runtime-controls"><button id="stackPause" class="ghost" type="button">Ⅱ 一時停止</button><button id="stackReset" class="ghost" type="button">↻ リセット</button><button id="stackFocus" class="ghost" type="button">⛶ 集中</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-smart" class="view">
+      <div class="panel smart-page">
+        <div class="smart-head">
+          <div>
+            <div class="page-kicker">SMART TIMER</div>
+            <div class="smart-title">時間を指定する。</div>
+            <div class="smart-desc">「あと30分」と「18:00まで」を同じタイマーで扱えます。終了時刻は端末の現在時刻を基準に計算します。</div>
+          </div>
+          <span class="badge">SMART</span>
+        </div>
+
+        <div class="smart-tabs">
+          <button id="smartTabDuration" class="smart-tab active" type="button">あと何分？</button>
+          <button id="smartTabEnd" class="smart-tab" type="button">何時まで？</button>
+        </div>
+
+        <div id="smartDurationCard" class="smart-card">
+          <div class="smart-grid">
+            <div class="field"><label>時間</label><input id="smartH" class="lx-number" data-numpad="true" type="text" inputmode="none" value="0" autocomplete="off" readonly></div>
+            <div class="field"><label>分</label><input id="smartM" class="lx-number" data-numpad="true" type="text" inputmode="none" value="30" autocomplete="off" readonly></div>
+            <div class="field"><label>秒</label><input id="smartS" class="lx-number" data-numpad="true" type="text" inputmode="none" value="0" autocomplete="off" readonly></div>
+          </div>
+          <div class="smart-quick">
+            <button class="quick smart-duration-preset" data-smart-min="5" type="button">5分</button>
+            <button class="quick smart-duration-preset" data-smart-min="15" type="button">15分</button>
+            <button class="quick smart-duration-preset" data-smart-min="25" type="button">25分</button>
+            <button class="quick smart-duration-preset" data-smart-min="50" type="button">50分</button>
+            <button class="quick smart-duration-preset" data-smart-min="90" type="button">90分</button>
+          </div>
+          <div class="smart-helper">開始すると、その瞬間から指定した時間を逆算します。</div>
+        </div>
+
+        <div id="smartEndCard" class="smart-card" hidden>
+          <div class="smart-clock-fields">
+            <div class="field"><label>時（24時間）</label><input id="smartEndH" class="lx-number" data-numpad="true" type="text" inputmode="none" value="18" autocomplete="off" readonly></div>
+            <div class="field"><label>分</label><input id="smartEndM" class="lx-number" data-numpad="true" type="text" inputmode="none" value="00" autocomplete="off" readonly></div>
+          </div>
+          <div class="smart-helper">指定時刻がすでに過ぎている場合は、次の日の同じ時刻として扱います。</div>
+        </div>
+
+        <div id="smartDisplay" class="smart-big-time">30:00</div>
+        <div id="smartTarget" class="smart-target">開始すると残り時間をカウントします。</div>
+        <div class="smart-status"><span id="smartDot" class="smart-dot"></span><span id="smartStatus" class="subtle">待機中</span></div>
+
+        <div class="smart-actions">
+          <button id="smartStart" class="primary" type="button">▶ 開始</button>
+        </div>
+
+        <div class="smart-summary">
+          <div class="stat"><div class="stat-k">設定時間</div><div id="smartConfigured" class="stat-v">30:00</div></div>
+          <div class="stat"><div class="stat-k">終了予定</div><div id="smartEta" class="stat-v">—</div></div>
+          <div class="stat"><div class="stat-k">指定方式</div><div id="smartModeLabel" class="stat-v">あと30分</div></div>
+        </div>
+        <div class="smart-note">スマホの時間入力はLX Timer専用数字パッドで完結します。</div>
+      </div>
+    </section>
+    <section id="view-automation" class="view">
+      <div class="panel automation-page">
+        <div class="automation-head">
+          <div>
+            <div class="page-kicker">SCHEDULES / ROUTINES</div>
+            <div class="automation-title">時間を自動で動かす。</div>
+            <div class="automation-desc">決まった時刻の開始と、繰り返し使う時間の流れをまとめて管理します。</div>
+          </div>
+          <span class="badge">AUTOMATION</span>
+        </div>
+
+        <div class="automation-tabs" role="tablist" aria-label="自動化">
+          <button id="automationTabSchedules" class="automation-tab active" type="button">スケジュール</button>
+          <button id="automationTabRoutines" class="automation-tab" type="button">ルーティン</button>
+        </div>
+
+        <div id="automationSchedulesPanel">
+          <div class="automation-builder">
+            <div class="automation-section-head">
+              <div><div class="settings-title">新しいスケジュール</div><div class="settings-desc">指定した時刻にタイマーまたはルーティンを開始します。</div></div>
+              <span class="small-note">ページを開いている間に実行</span>
+            </div>
+            <div class="automation-grid">
+              <div class="field automation-wide"><label>名前</label><input id="scheduleName" class="stack-input" type="text" maxlength="40" value="朝のタイマー" autocomplete="off"></div>
+              <div class="field"><label>時</label><input id="scheduleH" class="lx-number" data-numpad="true" type="text" inputmode="none" value="7" autocomplete="off" readonly></div>
+              <div class="field"><label>分</label><input id="scheduleM" class="lx-number" data-numpad="true" type="text" inputmode="none" value="00" autocomplete="off" readonly></div>
+              <div class="field"><label>繰り返し</label><select id="scheduleRepeat"><option value="once">1回のみ</option><option value="daily">毎日</option><option value="weekdays">平日</option><option value="weekends">週末</option><option value="custom">曜日指定</option></select></div>
+              <div class="field"><label>開始するもの</label><select id="scheduleAction"><option value="timer">通常タイマー</option><option value="routine">ルーティン</option></select></div>
+            </div>
+
+            <div id="scheduleDateRow" class="schedule-extra">
+              <div class="field"><label>実行日</label><input id="scheduleDate" type="date"></div>
+            </div>
+
+            <div id="scheduleDaysRow" class="schedule-extra" hidden>
+              <div class="field"><label>曜日</label>
+                <div id="scheduleDays" class="day-picker">
+                  <button type="button" data-schedule-day="1">月</button><button type="button" data-schedule-day="2">火</button><button type="button" data-schedule-day="3">水</button><button type="button" data-schedule-day="4">木</button><button type="button" data-schedule-day="5">金</button><button type="button" data-schedule-day="6">土</button><button type="button" data-schedule-day="0">日</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="scheduleTimerRow" class="schedule-extra">
+              <div class="field"><label>タイマー時間（分）</label><input id="scheduleMinutes" class="lx-number" data-numpad="true" type="text" inputmode="none" value="25" autocomplete="off" readonly></div>
+            </div>
+
+            <div id="scheduleRoutineRow" class="schedule-extra" hidden>
+              <div class="field"><label>ルーティン</label><select id="scheduleRoutine"></select></div>
+            </div>
+
+            <button id="scheduleAdd" class="primary" type="button">＋ スケジュールを追加</button>
+          </div>
+
+          <div class="automation-list-head"><div><div class="settings-title">登録済みスケジュール</div><div class="settings-desc">ONのスケジュールは、設定した時刻になると自動で開始します。</div></div></div>
+          <div id="scheduleList" class="automation-list"></div>
+        </div>
+
+        <div id="automationRoutinesPanel" hidden>
+          <div class="automation-builder">
+            <div class="automation-section-head">
+              <div><div class="settings-title">ルーティンを作る</div><div class="settings-desc">現在のTime Stackをそのまま、繰り返し使えるルーティンとして保存します。</div></div>
+              <span class="small-note">Time Stackから保存</span>
+            </div>
+            <div class="automation-grid routine-create-grid">
+              <div class="field automation-wide"><label>ルーティン名</label><input id="routineName" class="stack-input" type="text" maxlength="40" value="集中ルーティン" autocomplete="off"></div>
+              <button id="routineSave" class="primary" type="button">＋ 現在のTime Stackを保存</button>
+            </div>
+            <div id="routineSourcePreview" class="routine-source-preview"></div>
+          </div>
+
+          <div class="automation-list-head"><div><div class="settings-title">保存済みルーティン</div><div class="settings-desc">ルーティンは単独でも実行でき、スケジュールから自動開始もできます。</div></div></div>
+          <div id="routineList" class="automation-list"></div>
+        </div>
+
+        <div id="routineRuntime" class="routine-runtime" hidden>
+          <div class="routine-runtime-top">
+            <div><div class="routine-runtime-kicker">CURRENT ROUTINE</div><div id="routineRuntimeName" class="routine-runtime-name">集中ルーティン</div></div>
+            <span id="routineRuntimePhase" class="badge">1 / 1</span>
+          </div>
+          <div id="routineRuntimeBlock" class="routine-runtime-block">集中</div>
+          <div id="routineRuntimeTime" class="routine-runtime-time">25:00</div>
+          <div class="routine-runtime-progress"><div id="routineRuntimeProgress"></div></div>
+          <div id="routineRuntimeMeta" class="stack-current-meta">残り 1ブロック</div>
+          <div class="stack-runtime-controls"><button id="routinePause" class="ghost" type="button">Ⅱ 一時停止</button><button id="routineReset" class="ghost" type="button">↻ リセット</button><button id="routineFocus" class="ghost" type="button">⛶ 集中</button></div>
+        </div>
+
+        <div class="automation-note">スケジュールは、このページを開いている間にチェックされます。ブラウザを完全に閉じた状態でのバックグラウンド実行は、この段階では行いません。</div>
+      </div>
+    </section>
+    <section id="view-clock" class="view">
+      <div class="panel clock-page">
+        <div class="badge">CLOCK</div>
+        <div id="clockBig" class="clock-big">--:--:--</div>
+        <div id="clockDate" class="clock-date">----</div>
+        <div id="clockLocation" class="clock-location">端末（自動）</div>
+        <div class="world-clocks">
+          <div class="world-head"><div class="world-title">世界時計</div><div class="world-add"><select id="worldZoneSelect"></select><button id="addWorldZone" class="ghost">＋ 追加</button></div></div>
+          <div id="worldClockList" class="world-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="bottom-btn active" data-root-mode="home"><span class="bottom-icon">⌂</span><span class="bottom-label">ホーム</span></button>
+    <button class="bottom-btn" data-root-mode="timer"><span class="bottom-icon">◷</span><span class="bottom-label">タイマー</span></button>
+    <button class="bottom-btn" data-root-mode="stopwatch"><span class="bottom-icon">⏱</span><span class="bottom-label">ストップ</span></button>
+    <button class="bottom-btn" data-root-mode="clock"><span class="bottom-icon">◴</span><span class="bottom-label">時計</span></button>
+    <button class="bottom-btn" data-root-mode="history"><span class="bottom-icon">▤</span><span class="bottom-label">履歴</span></button>
+  </nav>
+</div>
+
+<div id="historyModal" class="modal-backdrop">
+  <div class="modal-card history-card">
+    <div class="modal-head"><div><div class="page-kicker">ACTIVITY</div><div class="modal-title">履歴と分析</div></div><button id="closeHistory" class="close" type="button">×</button></div>
+    <div class="stat-grid analytics-grid">
+      <div class="stat"><div class="stat-k">今日</div><div id="statToday" class="stat-v">0分</div></div>
+      <div class="stat"><div class="stat-k">過去7日</div><div id="statWeek" class="stat-v">0分</div></div>
+      <div class="stat"><div class="stat-k">累計セッション</div><div id="statSessions" class="stat-v">0</div></div>
+      <div class="stat"><div class="stat-k">平均セッション</div><div id="statAverage" class="stat-v">0分</div></div>
+    </div>
+    <div class="analysis-block">
+      <div class="analysis-head"><div><div class="settings-title">過去7日</div><div class="settings-desc">1日ごとの利用時間です。</div></div></div>
+      <div id="weeklyChart" class="weekly-chart"></div>
+    </div>
+    <div class="analysis-block">
+      <div class="analysis-head"><div><div class="settings-title">最近の記録</div><div class="settings-desc">完了したタイマー、インターバル、ストップウォッチを表示します。</div></div><button id="clearHistory" class="ghost small-btn" type="button">すべて削除</button></div>
+      <div id="historyList" class="history-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="settingsModal" class="modal-backdrop">
+  <div class="modal-card">
+    <div class="modal-head"><div><div class="page-kicker">SETTINGS</div><div class="modal-title">設定</div></div><button id="closeSettings" class="close">×</button></div>
+    <div class="settings-list">
+      <div class="settings-row"><div><div class="settings-title">アクセントカラー</div><div class="settings-desc">ボタンやハイライトの色です。</div></div><select id="accentSelect"><option value="amber">アンバー</option><option value="orange">オレンジ</option><option value="green">グリーン</option><option value="pink">ピンク</option><option value="red">レッド</option><option value="cyan">シアン</option><option value="violet">バイオレット</option></select></div>
+      <div class="settings-row"><div><div class="settings-title">テーマカラー</div><div class="settings-desc">背景やパネルなど、アプリ全体の雰囲気を変えます。アクセントカラーとは別に設定できます。</div></div><select id="themeSelect"><option value="midnight">ミッドナイト</option><option value="warm">ウォーム</option><option value="forest">フォレスト</option><option value="berry">ベリー</option><option value="slate">スレート</option><option value="sand">サンド</option><option value="light">ライト</option><option value="oled">OLED</option></select></div>
+      <div class="settings-row"><div><div class="settings-title">時計の地域</div><div class="settings-desc">ヘッダーと時計画面に使うタイムゾーンです。</div></div><select id="zoneSelect"><option value="local">端末（自動）</option><option value="Asia/Tokyo">東京</option><option value="Asia/Seoul">ソウル</option><option value="Asia/Shanghai">上海</option><option value="Asia/Singapore">シンガポール</option><option value="Australia/Sydney">シドニー</option><option value="Europe/London">ロンドン</option><option value="Europe/Paris">パリ</option><option value="America/New_York">ニューヨーク</option><option value="America/Los_Angeles">ロサンゼルス</option></select></div>
+      <div class="settings-row"><div><div class="settings-title">終了サウンド</div><div class="settings-desc">タイマーやインターバル終了時のサウンドです。</div></div><select id="soundSelect"><option value="soft">Soft Bell</option><option value="chime">Chime</option><option value="digital">Digital</option><option value="long">Long</option><option value="alarm">Alarm</option><option value="none">なし</option></select></div>
+      <div class="settings-row"><div><div class="settings-title">サウンドの長さ</div><div class="settings-desc">同じサウンドでも余韻の長さを変えられます。</div></div><select id="soundLength"><option value="short">短い</option><option value="normal">標準</option><option value="long">長い</option></select></div>
+      <div class="settings-row"><div><div class="settings-title">繰り返し</div><div class="settings-desc">終了サウンドを何回続けて鳴らすかです。</div></div><select id="soundRepeat"><option value="1">1回</option><option value="2">2回</option><option value="3">3回</option></select></div>
+      <div class="settings-row"><div><div class="settings-title">音量</div><div class="settings-desc">終了サウンドの音量です。</div></div><div class="range-wrap"><input id="volumeRange" type="range" min="0" max="100" step="1"><div id="volumeValue" class="range-val">80</div></div></div>
+      <div class="settings-row"><div><div class="settings-title">12 / 24時間表記</div><div class="settings-desc">時計表示の形式を切り替えます。</div></div><select id="hourMode"><option value="24">24時間</option><option value="12">12時間</option></select></div>
+      <div class="settings-row"><div><div class="settings-title">ブラウザ通知</div><div id="notificationDesc" class="settings-desc">タイマー終了時にブラウザ通知を表示します。</div></div><button id="notificationToggle" class="toggle-btn" type="button"><span id="notificationLabel">OFF</span><span class="toggle-pill"></span></button></div><div class="settings-row"><div><div class="settings-title">通知をテスト</div><div class="settings-desc">現在のブラウザ通知設定でテスト通知を送信します。</div></div><button id="testNotification" class="ghost" type="button">通知を送る</button></div>
+      <div class="settings-row"><div><div class="settings-title">画面をスリープさせない</div><div id="wakeDesc" class="settings-desc">対応ブラウザでは、タイマー動作中の画面スリープを防ぎます。</div></div><button id="wakeToggle" class="toggle-btn"><span id="wakeLabel">OFF</span><span class="toggle-pill"></span></button></div>
+      <div class="settings-row"><div><div class="settings-title">サウンドを試す</div><div class="settings-desc">現在の設定で終了サウンドを再生します。</div></div><button id="testSound" class="ghost">▶ 再生</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="completeOverlay" class="complete-overlay" aria-hidden="true">
+  <div class="complete-card">
+    <div class="complete-glow"></div>
+    <div class="complete-ring"><span>✓</span></div>
+    <div class="complete-kicker">SESSION COMPLETE</div>
+    <div id="completeTitle" class="complete-title">タイマー終了</div>
+    <div id="completeSub" class="complete-sub">セッションが完了しました。</div>
+    <button id="closeComplete" class="primary" type="button">閉じる</button>
+  </div>
+</div>
+
+
+<div id="textModal" class="modal-backdrop">
+  <div class="modal-card text-modal-card">
+    <div class="modal-head"><div><div class="page-kicker">INPUT</div><div id="textModalTitle" class="modal-title">入力</div></div><button id="textModalClose" class="close" type="button">×</button></div>
+    <div class="settings-desc" id="textModalDesc">名前を入力してください。</div>
+    <input id="textModalInput" class="stack-input" type="text" maxlength="40" autocomplete="off" style="margin-top:14px">
+    <div class="text-modal-actions"><button id="textModalCancel" class="ghost" type="button">キャンセル</button><button id="textModalOk" class="primary" type="button">決定</button></div>
+  </div>
+</div>
+
+<div id="confirmModal" class="modal-backdrop">
+  <div class="modal-card text-modal-card">
+    <div class="modal-head"><div><div class="page-kicker">CONFIRM</div><div id="confirmModalTitle" class="modal-title">確認</div></div><button id="confirmModalClose" class="close" type="button">×</button></div>
+    <div class="settings-desc" id="confirmModalDesc">この操作を実行しますか？</div>
+    <div class="confirm-actions"><button id="confirmModalCancel" class="ghost" type="button">キャンセル</button><button id="confirmModalOk" class="primary" type="button">実行</button></div>
+  </div>
+</div>
+
+<div id="numpadBackdrop" class="numpad-backdrop" aria-hidden="true">
+  <div class="numpad-card" role="dialog" aria-label="数字入力">
+    <div class="numpad-head"><div><div class="page-kicker">NUMBER INPUT</div><div id="numpadTitle" class="numpad-title">時間</div></div><div id="numpadValue" class="numpad-value">0</div></div>
+    <div class="numpad-grid">
+      <button class="numpad-key" data-key="1" type="button">1</button><button class="numpad-key" data-key="2" type="button">2</button><button class="numpad-key" data-key="3" type="button">3</button>
+      <button class="numpad-key" data-key="4" type="button">4</button><button class="numpad-key" data-key="5" type="button">5</button><button class="numpad-key" data-key="6" type="button">6</button>
+      <button class="numpad-key" data-key="7" type="button">7</button><button class="numpad-key" data-key="8" type="button">8</button><button class="numpad-key" data-key="9" type="button">9</button>
+      <button class="numpad-key utility" data-key="clear" type="button">クリア</button><button class="numpad-key" data-key="0" type="button">0</button><button class="numpad-key utility" data-key="backspace" type="button">⌫</button>
+    </div>
+    <div class="numpad-foot"><button class="numpad-key utility" data-key="cancel" type="button">キャンセル</button><button class="numpad-key done" data-key="done" type="button">決定</button></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"><span class="toast-dot"></span><span id="toastText">完了</span></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const STORAGE='timer_v6_settings';
+const FAVORITES_STORAGE='timer_v6_favorites';
+const WORLD_STORAGE='timer_v6_world_clocks';
+const STACK_STORAGE='timer_ultra_time_stack';
+const STACK_RUNTIME_STORAGE='timer_ultra_time_stack_runtime';
+const SCHEDULE_STORAGE='timer_ultra_schedules';
+const ROUTINE_STORAGE='timer_ultra_routines';
+const ROUTINE_RUNTIME_STORAGE='timer_ultra_routine_runtime';
+const defaults={accent:'amber',theme:'midnight',zone:'local',sound:'soft',soundLength:'normal',soundRepeat:1,volume:80,hourMode:'24',wakeLock:false,notifications:true,notificationOptOut:false};
+let prefs={...defaults};
+try{prefs={...defaults,...JSON.parse(localStorage.getItem(STORAGE)||'{}')}}catch{}
+// ブラウザ通知がすでに許可済みなら、過去の古いOFF保存値を初回だけ自動同期する
+if('Notification' in window && Notification.permission==='granted' && !prefs.notificationOptOut){
+  prefs.notifications=true;
+  try{localStorage.setItem(STORAGE,JSON.stringify(prefs))}catch{}
+}
+const accents={
+  amber:{main:'#f59e0b',rgb:'245,158,11'},
+  orange:{main:'#fb7a1a',rgb:'251,122,26'},
+  green:{main:'#4ade80',rgb:'74,222,128'},
+  pink:{main:'#f472b6',rgb:'244,114,182'},
+  red:{main:'#fb7185',rgb:'251,113,133'},
+  cyan:{main:'#22d3ee',rgb:'34,211,238'},
+  violet:{main:'#a78bfa',rgb:'167,139,250'}
+};
+const themes={
+  midnight:{bg:'#111419',bg2:'#0a0c0f',panel:'rgba(27,30,36,.90)',panel2:'rgba(255,255,255,.07)',border:'rgba(255,255,255,.08)',text:'#f5f7fa',muted:'#9399a4',muted2:'#666d78',shadow:'0 20px 60px rgba(0,0,0,.30)'},
+  warm:{bg:'#211911',bg2:'#140f0b',panel:'rgba(49,38,28,.90)',panel2:'rgba(255,255,255,.065)',border:'rgba(255,241,224,.09)',text:'#fbf6ee',muted:'#afa396',muted2:'#756b60',shadow:'0 20px 60px rgba(0,0,0,.32)'},
+  forest:{bg:'#101a15',bg2:'#0a120e',panel:'rgba(27,43,35,.90)',panel2:'rgba(235,255,245,.055)',border:'rgba(220,255,236,.085)',text:'#f1f8f3',muted:'#97a99f',muted2:'#62766a',shadow:'0 20px 60px rgba(0,0,0,.30)'},
+  berry:{bg:'#1d131a',bg2:'#110a0f',panel:'rgba(48,28,41,.90)',panel2:'rgba(255,240,249,.055)',border:'rgba(255,224,241,.085)',text:'#faf1f7',muted:'#ae9aa5',muted2:'#75636e',shadow:'0 20px 60px rgba(0,0,0,.32)'},
+  slate:{bg:'#141a21',bg2:'#0b1015',panel:'rgba(30,39,49,.90)',panel2:'rgba(240,248,255,.06)',border:'rgba(223,238,255,.085)',text:'#f2f6fa',muted:'#98a4af',muted2:'#64717c',shadow:'0 20px 60px rgba(0,0,0,.31)'},
+  sand:{bg:'#29241d',bg2:'#19150f',panel:'rgba(58,50,40,.90)',panel2:'rgba(255,248,235,.06)',border:'rgba(255,245,222,.09)',text:'#faf5e9',muted:'#b1a894',muted2:'#786f60',shadow:'0 20px 60px rgba(0,0,0,.34)'},
+  light:{bg:'#f2f3f5',bg2:'#e7e9ed',panel:'rgba(255,255,255,.90)',panel2:'rgba(17,24,39,.055)',border:'rgba(17,24,39,.10)',text:'#15181d',muted:'#626b78',muted2:'#89919c',shadow:'0 18px 50px rgba(27,35,49,.10)'},
+  oled:{bg:'#000000',bg2:'#000000',panel:'rgba(9,9,9,.96)',panel2:'rgba(255,255,255,.065)',border:'rgba(255,255,255,.10)',text:'#f5f5f5',muted:'#929292',muted2:'#5f5f5f',shadow:'0 18px 50px rgba(0,0,0,.75)'}
+};
+function applyPrefs(){
+  const a=accents[prefs.accent]||accents.amber;
+  const t=themes[prefs.theme]||themes.midnight;
+  const r=document.documentElement.style;
+  r.setProperty('--accent',a.main);r.setProperty('--accent-rgb',a.rgb);
+  r.setProperty('--bg',t.bg);r.setProperty('--bg-2',t.bg2);r.setProperty('--panel',t.panel);r.setProperty('--panel-2',t.panel2);r.setProperty('--border',t.border);r.setProperty('--text',t.text);r.setProperty('--muted',t.muted);r.setProperty('--muted-2',t.muted2);r.setProperty('--shadow',t.shadow);document.documentElement.classList.toggle('light-mode',prefs.theme==='light');r.setProperty('color-scheme',prefs.theme==='light'?'light':'dark');
+  r.setProperty('--range-pct',`${prefs.volume}%`);
+  const metaTheme=document.querySelector('meta[name=theme-color]');
+  if(metaTheme) metaTheme.setAttribute('content', t.bg2 || t.bg);
+  $('accentSelect').value=prefs.accent;$('themeSelect').value=prefs.theme;$('zoneSelect').value=prefs.zone;$('soundSelect').value=prefs.sound;$('soundLength').value=prefs.soundLength;$('soundRepeat').value=String(prefs.soundRepeat);$('volumeRange').value=prefs.volume;$('volumeValue').textContent=prefs.volume;$('hourMode').value=prefs.hourMode;updateWakeButton();updateNotificationButton();
+}
+function savePrefs(){localStorage.setItem(STORAGE,JSON.stringify(prefs));applyPrefs();}
+applyPrefs();
+
+let mode='home';
+const titles={home:'ホーム',timer:'タイマー',stopwatch:'ストップウォッチ',interval:'インターバル',multi:'複数タイマー',stack:'Time Stack',smart:'Smart Timer',automation:'自動化',clock:'時計'};
+const timerModes=['timer','interval','multi','stack','smart','automation'];
+let automationTab='schedules';
+let rootMode='home';
+let favorites=[];
+try{favorites=JSON.parse(localStorage.getItem(FAVORITES_STORAGE)||'[]')}catch{favorites=[]}
+let worldZones=[];
+try{worldZones=JSON.parse(localStorage.getItem(WORLD_STORAGE)||'["Asia/Tokyo","America/New_York","Europe/London"]')}catch{worldZones=['Asia/Tokyo','America/New_York','Europe/London']}
+const worldNames={'Asia/Tokyo':'東京','Asia/Seoul':'ソウル','Asia/Shanghai':'上海','Asia/Singapore':'シンガポール','Australia/Sydney':'シドニー','Europe/London':'ロンドン','Europe/Paris':'パリ','Europe/Berlin':'ベルリン','America/New_York':'ニューヨーク','America/Chicago':'シカゴ','America/Los_Angeles':'ロサンゼルス','Pacific/Honolulu':'ホノルル'};
+const worldOptions=[...new Set(Object.keys(worldNames))];
+function saveFavorites(){localStorage.setItem(FAVORITES_STORAGE,JSON.stringify(favorites))}
+function saveWorldZones(){localStorage.setItem(WORLD_STORAGE,JSON.stringify(worldZones))}
+
+let stackData=[];
+try{stackData=JSON.parse(localStorage.getItem(STACK_STORAGE)||'[]');if(!Array.isArray(stackData))stackData=[]}catch{stackData=[]}
+const stack={running:false,index:0,remaining:0,endAt:0,startedAt:0};
+let editingStackIndex=-1;
+function saveStack(){localStorage.setItem(STACK_STORAGE,JSON.stringify(stackData))}
+function stackTotalSeconds(){return stackData.reduce((sum,b)=>sum+(Number(b.seconds)||0),0)}
+function resetStackRuntime(){stack.running=false;stack.index=0;stack.remaining=stackData[0]?.seconds||0;stack.endAt=0;stack.startedAt=0;localStorage.removeItem(STACK_RUNTIME_STORAGE);renderStackRuntime();}
+function saveStackRuntime(){localStorage.setItem(STACK_RUNTIME_STORAGE,JSON.stringify({running:stack.running,index:stack.index,remaining:stack.running?Math.max(0,(stack.endAt-Date.now())/1000):stack.remaining,endAt:stack.endAt,startedAt:stack.startedAt,savedAt:Date.now()}))}
+function loadStackRuntime(){try{return JSON.parse(localStorage.getItem(STACK_RUNTIME_STORAGE)||'null')}catch{return null}}
+function renderStackList(){
+  const el=$('stackList');
+  if(!stackData.length){el.innerHTML='<div class="stack-empty">まだブロックがありません。上で時間を追加してください。</div>';}
+  else el.innerHTML=stackData.map((b,i)=>`<div class="stack-item"><div class="stack-index">${i+1}</div><div><div class="stack-item-name">${escapeHtml(b.name)}</div><div class="stack-item-meta">${formatCountdown(b.seconds)}</div></div><div class="stack-item-actions"><button class="stack-mini edit" data-stack-edit="${i}" type="button" aria-label="編集">✎</button><button class="stack-mini" data-stack-up="${i}" type="button" aria-label="上へ">↑</button><button class="stack-mini" data-stack-down="${i}" type="button" aria-label="下へ">↓</button><button class="stack-mini" data-stack-del="${i}" type="button" aria-label="削除">×</button></div></div>`).join('');
+  $('stackTotal').textContent=formatCountdown(stackTotalSeconds());
+  $('stackStart').disabled=!stackData.length;
+}
+function renderStackRuntime(){
+  const box=$('stackRuntime');
+  if(!stack.running && stack.remaining<=0 && !stackData.length){box.hidden=true;return}
+  if(!stackData.length){box.hidden=true;return}
+  const i=Math.min(stack.index,stackData.length-1),b=stackData[i];
+  const remain=Math.max(0,stack.running?(stack.endAt-Date.now())/1000:stack.remaining);
+  stack.remaining=remain;
+  box.hidden=false;
+  $('stackRuntimeName').textContent=b?.name||'ブロック';
+  $('stackRuntimePhase').textContent=`${i+1} / ${stackData.length}`;
+  $('stackRuntimeTime').textContent=formatCountdown(remain);
+  const total=Number(b?.seconds)||1;
+  $('stackRuntimeProgress').style.width=`${Math.max(0,Math.min(100,(1-remain/total)*100))}%`;
+  $('stackRuntimeMeta').textContent=stack.running?`${stackData.length-(i+1)}ブロック待機中`:`${stackData.length-(i+1)}ブロック待機中 · 一時停止`;
+  $('stackPause').textContent=stack.running?'Ⅱ 一時停止':'▶ 再開';
+}
+function startStack(){
+  if(!stackData.length)return;
+  if(stack.index>=stackData.length || stack.remaining<=0){stack.index=0;stack.remaining=stackData[0].seconds}
+  if(stack.running)return;
+  stack.endAt=Date.now()+stack.remaining*1000;stack.running=true;stack.startedAt=stack.startedAt||Date.now();saveStackRuntime();renderStackRuntime();
+}
+function completeStack(){
+  stack.running=false;stack.remaining=0;playSound(prefs.sound);notify('LX Timer Ultra','Time Stackのブロックが完了しました。');
+  const doneIndex=stack.index;
+  if(doneIndex>=stackData.length-1){
+    const total=stackTotalSeconds(); addHistoryEntry('stack',total,'Time Stack'); showCompletion('Time Stack 完了',`${stackData.length}ブロックを完了しました`); resetStackRuntime(); return;
+  }
+  stack.index++;stack.remaining=stackData[stack.index].seconds;stack.endAt=Date.now()+stack.remaining*1000;stack.running=true;saveStackRuntime();renderStackRuntime();
+}
+function tickStack(){
+  if(!stack.running){renderStackRuntime();return}
+  stack.remaining=Math.max(0,(stack.endAt-Date.now())/1000);
+  if(stack.remaining<=0){completeStack();return}
+  renderStackRuntime();saveStackRuntime();
+}
+function pauseStack(){
+  if(!stack.running){startStack();return}
+  stack.remaining=Math.max(0,(stack.endAt-Date.now())/1000);stack.running=false;stack.endAt=0;saveStackRuntime();renderStackRuntime();
+}
+function resetStack(){resetStackRuntime();}
+function restoreStackRuntime(){
+  const st=loadStackRuntime(); if(!st||!stackData.length)return;
+  stack.index=Math.max(0,Math.min(stackData.length-1,Number(st.index)||0));
+  stack.remaining=Math.max(0,Number(st.remaining)||stackData[stack.index].seconds);
+  stack.startedAt=Number(st.startedAt)||0;
+  if(st.running){
+    const savedAt=Number(st.savedAt)||Date.now();
+    const remainingAfter=Math.max(0,stack.remaining-(Date.now()-savedAt)/1000);
+    stack.remaining=remainingAfter;
+    if(remainingAfter<=0){
+      while(stack.index<stackData.length-1&&stack.remaining<=0){stack.index++;stack.remaining=stackData[stack.index].seconds;}
+      if(stack.remaining<=0){showCompletion('Time Stack 完了',`${stackData.length}ブロックを完了しました`);resetStackRuntime();return;}
+    }
+    stack.endAt=Date.now()+stack.remaining*1000;stack.running=true;
+  }
+  renderStackRuntime();
+}
+function addStackBlock(name,minutes){
+  const m=Math.max(1,Math.min(999,Math.round(Number(minutes)||0))); if(!m)return;
+  const cleanName=(name||'ブロック').trim().slice(0,40)||'ブロック';
+  if(editingStackIndex>=0 && editingStackIndex<stackData.length){
+    stackData[editingStackIndex]={...stackData[editingStackIndex],name:cleanName,seconds:m*60};
+    if(!stack.running && stack.index===editingStackIndex)stack.remaining=m*60;
+    editingStackIndex=-1; $('stackAdd').textContent='＋ ブロックを追加';
+  }else{
+    stackData.push({name:cleanName,seconds:m*60});
+    if(!stack.running&&stack.index>=stackData.length-1)stack.remaining=stackData[stack.index]?.seconds||0;
+  }
+  saveStack();renderStackList();renderStackRuntime();
+}
+function editStackBlock(i){if(stack.running){toast('実行中はブロックを編集できません');return}const b=stackData[i];if(!b)return;editingStackIndex=i;$('stackName').value=b.name;$('stackMinutes').value=String(Math.max(1,Math.round(b.seconds/60)));$('stackAdd').textContent='✓ 編集を保存';$('stackName').focus();}
+function applyStackTemplate(values){
+  editingStackIndex=-1;$('stackAdd').textContent='＋ ブロックを追加';
+  stackData=values.map((m,i)=>({name:i%2===0?'集中':'休憩',seconds:m*60}));saveStack();resetStackRuntime();renderStackList();renderStackRuntime();toast('テンプレートを追加しました')
+}
+// ===== Phase 3: Multiple Timers =====
+const MULTI_STORAGE='lx_timer_ultra_multiple_v1';
+let multiTimers=[];
+try{multiTimers=JSON.parse(localStorage.getItem(MULTI_STORAGE)||'[]');if(!Array.isArray(multiTimers))multiTimers=[]}catch{multiTimers=[]}
+function saveMulti(){localStorage.setItem(MULTI_STORAGE,JSON.stringify(multiTimers.slice(0,24)))}
+function multiNowRemaining(t){return Math.max(0,t.running?(t.endAt-Date.now())/1000:Number(t.remaining)||0)}
+function multiRunningCount(){return multiTimers.filter(t=>t.running).length}
+function normalizeMultiName(v){return String(v||'タイマー').trim().slice(0,40)||'タイマー'}
+function newMultiTimer(name,minutes){const sec=Math.max(60,Math.min(999*60,Math.round(Number(minutes)||0)*60));const t={id:Date.now()+Math.random(),name:normalizeMultiName(name),total:sec,remaining:sec,running:false,endAt:0,createdAt:Date.now()};multiTimers.unshift(t);multiTimers=multiTimers.slice(0,24);saveMulti();renderMulti();toast('タイマーを追加しました')}
+function renderMulti(){
+  const el=$('multiList');
+  $('multiCount').textContent=String(multiTimers.length);
+  $('multiRunningCount').textContent=String(multiRunningCount());
+  $('multiStartAll').disabled=!multiTimers.length||multiRunningCount()===multiTimers.length;
+  $('multiPauseAll').disabled=multiRunningCount()===0;
+  if(!multiTimers.length){el.innerHTML='<div class="multi-empty">まだ複数タイマーがありません。上からタイマーを追加してください。</div>';return}
+  el.innerHTML=multiTimers.map(t=>{
+    const rem=multiNowRemaining(t),total=Math.max(1,Number(t.total)||1),pct=Math.max(0,Math.min(100,(1-rem/total)*100));
+    const state=t.running?'動作中':rem<=0?'完了':'待機中';
+    return `<article class="multi-card ${t.running?'running':''}" data-multi-card="${t.id}">
+      <div class="multi-card-top"><div class="multi-card-name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div><span class="multi-card-state">${state}</span></div>
+      <div class="multi-time">${formatCountdown(rem)}</div>
+      <div class="multi-progress"><div style="width:${pct}%"></div></div>
+      <div class="multi-meta"><span>設定 ${formatCountdown(t.total)}</span><span>${t.running?'残り時間':'一時停止可能'}</span></div>
+      <div class="multi-controls">
+        <button data-multi-toggle="${t.id}" type="button">${t.running?'Ⅱ 停止':'▶ 開始'}</button>
+        <button data-multi-plus="${t.id}" data-delta="60" type="button">＋1分</button>
+        <button data-multi-plus="${t.id}" data-delta="-60" type="button">−1分</button>
+        <button data-multi-reset="${t.id}" type="button">↻</button>
+        <button class="multi-danger" data-multi-delete="${t.id}" type="button">×</button>
+      </div>
+    </article>`
+  }).join('');
+}
+function findMulti(id){return multiTimers.find(t=>String(t.id)===String(id))}
+function toggleMulti(id){const t=findMulti(id);if(!t)return;if(t.running){t.remaining=multiNowRemaining(t);t.running=false;t.endAt=0}else{if(t.remaining<=0)t.remaining=t.total;if(t.remaining<=0)return;t.endAt=Date.now()+t.remaining*1000;t.running=true}saveMulti();syncWakeLock();renderMulti()}
+function startAllMulti(){let started=0;multiTimers.forEach(t=>{if(!t.running){if(t.remaining<=0)t.remaining=t.total;if(t.remaining>0){t.endAt=Date.now()+t.remaining*1000;t.running=true;started++}}});if(started){saveMulti();syncWakeLock();renderMulti();toast(`${started}個のタイマーを開始しました`)}}
+function pauseAllMulti(){let paused=0;multiTimers.forEach(t=>{if(t.running){t.remaining=multiNowRemaining(t);t.running=false;t.endAt=0;paused++}});if(paused){saveMulti();syncWakeLock();renderMulti();toast(`${paused}個のタイマーを停止しました`)}}
+function resetMulti(id){const t=findMulti(id);if(!t)return;t.running=false;t.remaining=t.total;t.endAt=0;saveMulti();syncWakeLock();renderMulti()}
+function adjustMulti(id,delta){const t=findMulti(id);if(!t)return;t.remaining=Math.max(60,Math.min(999*60,multiNowRemaining(t)+delta));t.total=Math.max(t.total,t.remaining);if(t.running)t.endAt=Date.now()+t.remaining*1000;saveMulti();renderMulti()}
+function deleteMulti(id){const i=multiTimers.findIndex(t=>String(t.id)===String(id));if(i<0)return;const wasRunning=multiTimers[i].running;multiTimers.splice(i,1);saveMulti();if(wasRunning)syncWakeLock();renderMulti();toast('タイマーを削除しました')}
+function completeMulti(t){t.running=false;t.remaining=0;t.endAt=0;playSound(prefs.sound);notify('LX Timer Ultra',`${t.name} が終了しました。`);addHistoryEntry('timer',t.total,t.name);saveMulti();renderMulti();toast(`${t.name} が終了しました`)}
+function tickMulti(){let changed=false;multiTimers.forEach(t=>{if(!t.running)return;const rem=multiNowRemaining(t);if(rem<=0){completeMulti(t);changed=true}else{t.remaining=rem;changed=true}});if(changed)saveMulti();syncWakeLock();renderMulti()}
+function clearAllMulti(){if(!multiTimers.length)return;openConfirmModal('複数タイマーをすべて削除しますか？','登録中のタイマーをすべて削除します。',()=>{multiTimers=[];saveMulti();syncWakeLock();renderMulti();toast('複数タイマーをすべて削除しました')})}
+$('multiAdd').addEventListener('click',()=>{newMultiTimer($('multiName').value,$('multiMinutes').value);$('multiName').value=`タイマー ${multiTimers.length+1}`;$('multiMinutes').value='25'});
+$('multiName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('multiAdd').click()}});
+$('multiStartAll').addEventListener('click',startAllMulti);
+$('multiPauseAll').addEventListener('click',pauseAllMulti);
+$('multiClearAll').addEventListener('click',clearAllMulti);
+document.querySelectorAll('.multi-preset').forEach(b=>b.addEventListener('click',()=>{newMultiTimer(b.dataset.multiName,Number(b.dataset.multiMin));}));
+$('multiList').addEventListener('click',e=>{const toggle=e.target.closest('[data-multi-toggle]'),plus=e.target.closest('[data-multi-plus]'),reset=e.target.closest('[data-multi-reset]'),del=e.target.closest('[data-multi-delete]');if(toggle){toggleMulti(toggle.dataset.multiToggle);return}if(plus){adjustMulti(plus.dataset.multiPlus,Number(plus.dataset.delta)||0);return}if(reset){resetMulti(reset.dataset.multiReset);return}if(del){deleteMulti(del.dataset.multiDelete)}});
+
+// ===== Phase 4: Smart Timer =====
+const SMART_STORAGE='lx_timer_ultra_smart_runtime_v1';
+const smart={mode:'duration',duration:1800,remaining:1800,targetAt:0,running:false,endHour:18,endMinute:0};
+function smartSave(){try{localStorage.setItem(SMART_STORAGE,JSON.stringify(smart))}catch{}}
+function smartLoad(){try{const v=JSON.parse(localStorage.getItem(SMART_STORAGE)||'null');if(v&&typeof v==='object')Object.assign(smart,v)}catch{}}
+function smartDurationInputSeconds(){const h=Math.max(0,Math.min(99,Number($('smartH').value)||0));const m=Math.max(0,Math.min(59,Number($('smartM').value)||0));const s=Math.max(0,Math.min(59,Number($('smartS').value)||0));return h*3600+m*60+s}
+function smartTargetForTime(h,m){const now=new Date();const target=new Date(now);target.setHours(h,m,0,0);if(target.getTime()<=now.getTime())target.setDate(target.getDate()+1);return target}
+function smartRemaining(){return smart.running?Math.max(0,(smart.targetAt-Date.now())/1000):Math.max(0,smart.remaining)}
+function smartEndText(){if(!smart.running&&smart.remaining<=0)return '—';const d=new Date(smart.targetAt);return d.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',hour12:false})}
+function syncSmartFields(){
+  $('smartH').value=Math.floor(smart.duration/3600);
+  $('smartM').value=Math.floor((smart.duration%3600)/60);
+  $('smartS').value=smart.duration%60;
+  $('smartEndH').value=String(smart.endHour).padStart(2,'0');
+  $('smartEndM').value=String(smart.endMinute).padStart(2,'0');
+}
+function smartSetDuration(sec){smart.mode='duration';smart.duration=Math.max(1,Math.floor(sec));smart.remaining=smart.duration;smart.targetAt=0;smart.running=false;syncSmartFields();smartSave();renderSmart()}
+function smartSetEndTime(h,m){h=Math.max(0,Math.min(23,Math.floor(Number(h)||0)));m=Math.max(0,Math.min(59,Math.floor(Number(m)||0)));smart.mode='end';smart.endHour=h;smart.endMinute=m;const target=smartTargetForTime(h,m);smart.targetAt=target.getTime();smart.remaining=Math.max(0,(target.getTime()-Date.now())/1000);smart.running=false;smartSave();renderSmart()}
+function smartSelectMode(mode){if(smart.running)return;smart.mode=mode;if(mode==='duration'){if(smart.duration<=0)smart.duration=1800;smart.remaining=smart.duration;smart.targetAt=0}else{const target=smartTargetForTime(smart.endHour,smart.endMinute);smart.targetAt=target.getTime();smart.remaining=Math.max(0,(target.getTime()-Date.now())/1000)}smartSave();renderSmart()}
+function renderSmart(){
+  const rem=Math.max(0,smartRemaining());
+  const endWaiting=smart.mode==='end'&&!smart.running&&!smart.targetAt;
+  $('smartDisplay').textContent=endWaiting?'—':formatCountdown(rem);
+  $('smartConfigured').textContent=smart.mode==='duration'?formatCountdown(smart.duration):(endWaiting?'—':formatCountdown(Math.max(0,smart.remaining)));
+  document.querySelector('#smartConfigured').previousElementSibling.textContent=smart.mode==='duration'?'設定時間':'残り時間';
+  $('smartEta').textContent=smart.running?smartEndText():(smart.mode==='end'?`${String(smart.endHour).padStart(2,'0')}:${String(smart.endMinute).padStart(2,'0')}`:'開始時に決定');
+  $('smartModeLabel').textContent=smart.mode==='duration'?`あと${formatCountdown(smart.duration)}`:`${String(smart.endHour).padStart(2,'0')}:${String(smart.endMinute).padStart(2,'0')}まで`;
+  $('smartStatus').textContent=smart.running?'動作中':'待機中';
+  $('smartDot').classList.toggle('on',smart.running);
+  $('smartStart').textContent=smart.running?'Ⅱ 一時停止':'▶ 開始';
+  if(smart.running){
+    $('smartTarget').textContent=`終了予定 ${smartEndText()}`;
+  }else if(smart.mode==='duration'){
+    $('smartTarget').textContent='開始すると残り時間をカウントします。';
+  }else if(endWaiting){
+    $('smartTarget').textContent=`開始すると ${String(smart.endHour).padStart(2,'0')}:${String(smart.endMinute).padStart(2,'0')} までを計算します。`;
+  }else{
+    $('smartTarget').textContent=`終了時刻 ${String(smart.endHour).padStart(2,'0')}:${String(smart.endMinute).padStart(2,'0')} を目標にします。`;
+  }
+  const dActive=smart.mode==='duration',eActive=!dActive;$('smartDurationCard').hidden=eActive;$('smartEndCard').hidden=dActive;$('smartTabDuration').classList.toggle('active',dActive);$('smartTabEnd').classList.toggle('active',eActive);
+}
+function smartStart(){
+  if(smart.running){smart.remaining=smartRemaining();smart.running=false;smart.targetAt=0;smartSave();syncWakeLock();renderSmart();return}
+  let sec;
+  if(smart.mode==='duration'){sec=Math.max(1,smart.duration);smart.remaining=sec}
+  else {const target=smartTargetForTime(smart.endHour,smart.endMinute);smart.targetAt=target.getTime();sec=Math.max(1,(target.getTime()-Date.now())/1000);smart.remaining=sec}
+  smart.targetAt=Date.now()+sec*1000;smart.running=true;smartSave();syncWakeLock();renderSmart()
+}
+function completeSmart(){const total=smart.mode==='duration'?smart.duration:Math.max(1,smart.remaining||1);smart.running=false;smart.remaining=0;smart.targetAt=0;smartSave();syncWakeLock();playSound(prefs.sound);notify('LX Timer Ultra','Smart Timerが終了しました。');addHistoryEntry('timer',total,smart.mode==='duration'?'Smart Timer':'Smart Timer（終了時刻）');showCompletion('Smart Timer終了',smart.mode==='duration'?`${formatCountdown(total)} を完了しました`:'指定した終了時刻になりました');renderSmart()}
+function tickSmart(){if(smart.running){smart.remaining=Math.max(0,(smart.targetAt-Date.now())/1000);if(smart.remaining<=0)completeSmart()}renderSmart();smartSave()}
+$('smartTabDuration').addEventListener('click',()=>smartSelectMode('duration'));
+$('smartTabEnd').addEventListener('click',()=>smartSelectMode('end'));
+$('smartStart').addEventListener('click',smartStart);
+['smartH','smartM','smartS'].forEach(id=>$(id).addEventListener('input',()=>{if(smart.running)return;smart.duration=smartDurationInputSeconds();smart.remaining=smart.duration;smart.targetAt=0;smart.mode='duration';smartSave();renderSmart()}));
+['smartEndH','smartEndM'].forEach(id=>$(id).addEventListener('input',()=>{if(smart.running)return;smart.endHour=Math.max(0,Math.min(23,Number($('smartEndH').value)||0));smart.endMinute=Math.max(0,Math.min(59,Number($('smartEndM').value)||0));if(smart.mode==='end'){const t=smartTargetForTime(smart.endHour,smart.endMinute);smart.targetAt=t.getTime();smart.remaining=Math.max(0,(t.getTime()-Date.now())/1000)}smartSave();renderSmart()}));
+document.querySelectorAll('.smart-duration-preset').forEach(b=>b.addEventListener('click',()=>smartSetDuration(Number(b.dataset.smartMin)*60)));
+smartLoad();
+function currentTimerSeconds(){return Math.max(0,Math.round(timer.running?timer.remaining:(Number(timer.total)||0)))}
+function renderFavorites(){const el=$('favoriteList');if(!favorites.length){el.innerHTML='<div class="small-note" style="margin-top:0">よく使う時間を保存すると、ここからすぐ設定できます。</div>';return}el.innerHTML=favorites.map((f,i)=>`<div class="favorite"><button class="favorite-main" data-fav="${i}" aria-label="${f.name} ${formatCountdown(f.seconds)}"><span class="fav-name">${escapeHtml(f.name)}</span><span class="fav-time">${formatCountdown(f.seconds)}</span></button><button class="fav-delete" data-del-fav="${i}" aria-label="削除">×</button></div>`).join('')}
+function escapeHtml(v){return String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\"','&quot;').replaceAll("'",'&#039;')}
+function renderWorldOptions(){const sel=$('worldZoneSelect');sel.innerHTML=worldOptions.filter(z=>!worldZones.includes(z)).map(z=>`<option value="${z}">${worldNames[z]}</option>`).join('');if(!sel.options.length){sel.innerHTML='<option value="">追加できる地域はありません</option>';sel.disabled=true;$('addWorldZone').disabled=true}else{sel.disabled=false;$('addWorldZone').disabled=false}}
+function renderWorldClocks(){const el=$('worldClockList');const now=new Date();el.innerHTML=worldZones.map((z,i)=>{const time=new Intl.DateTimeFormat('ja-JP',{timeZone:z,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:prefs.hourMode==='12'}).format(now);return `<div class="world-card"><div><div class="world-name">${worldNames[z]||z}</div><div class="world-zone">${z}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="world-time">${time}</div><button class="world-remove" data-del-world="${i}" aria-label="削除">×</button></div></div>`}).join('');renderWorldOptions()}
+
+function rootForMode(m){return timerModes.includes(m)?'timer':m==='history'?'history':m}
+function syncNavigation(m){rootMode=rootForMode(m);document.querySelectorAll('[data-root-mode]').forEach(b=>b.classList.toggle('active',b.dataset.rootMode===rootMode));const timerOpen=rootMode==='timer';document.querySelector('.nav-subnav')?.classList.toggle('show',timerOpen);document.querySelectorAll('[data-timer-submode]').forEach(b=>b.classList.toggle('active',b.dataset.timerSubmode===m));$('timerSubnav').classList.toggle('show',timerOpen);}
+function setMode(m){mode=m;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+m));$('pageTitle').textContent=titles[m]||'ホーム';syncNavigation(m);renderAll();}
+document.querySelectorAll('[data-root-mode]').forEach(b=>b.addEventListener('click',()=>{const r=b.dataset.rootMode;if(r==='history'){rootMode='history';document.querySelectorAll('[data-root-mode]').forEach(x=>x.classList.toggle('active',x.dataset.rootMode==='history'));openHistory();return}if(r==='timer'){setMode(timerModes.includes(mode)?mode:'timer')}else setMode(r)}));
+document.querySelectorAll('[data-timer-submode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.timerSubmode)));
+document.querySelectorAll('[data-home-target]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.homeTarget)));
+
+function zoneUsed(){return prefs.zone==='local'?Intl.DateTimeFormat().resolvedOptions().timeZone:prefs.zone}
+function zoneLabel(){if(prefs.zone==='local') return '端末（自動）';const names={'Asia/Tokyo':'東京','Asia/Seoul':'ソウル','Asia/Shanghai':'上海','Asia/Singapore':'シンガポール','Australia/Sydney':'シドニー','Europe/London':'ロンドン','Europe/Paris':'パリ','America/New_York':'ニューヨーク','America/Los_Angeles':'ロサンゼルス'};return names[prefs.zone]||prefs.zone}
+function fmtClock(date){return new Intl.DateTimeFormat('ja-JP',{timeZone:zoneUsed(),hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:prefs.hourMode==='12'}).format(date)}
+function fmtDate(date){return new Intl.DateTimeFormat('ja-JP',{timeZone:zoneUsed(),year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(date)}
+function renderClock(){const now=new Date(),t=fmtClock(now);$('headerClock').textContent=t;$('headerZone').textContent=zoneLabel();$('clockBig').textContent=t;$('clockDate').textContent=fmtDate(now);$('clockLocation').textContent=zoneLabel()}
+
+function formatCountdown(sec){sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
+function formatStopwatch(ms){const total=Math.max(0,ms);const hrs=Math.floor(total/3600000),min=Math.floor(total%3600000/60000),sec=Math.floor(total/1000)%60,cs=Math.floor(total/10)%100;return hrs?`${String(hrs).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(cs).padStart(2,'0')}`:`${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;}
+
+const RUNTIME_STORAGE='timer_v8_runtime';
+let lastRuntimeSave=0;
+const timer={total:1500,remaining:1500,running:false,endAt:0};
+function notify(title,body){if(!prefs.notifications||!('Notification' in window)||Notification.permission!=='granted')return;try{new Notification(title,{body})}catch{}}
+function updateTimerFromInputs(){if(timer.running)return;const h=Math.max(0,Number($('timerH').value)||0),m=Math.max(0,Math.min(59,Number($('timerM').value)||0)),s=Math.max(0,Math.min(59,Number($('timerS').value)||0));timer.total=h*3600+m*60+s;timer.remaining=timer.total;saveRuntimeState(true);renderTimer()}
+function setTimer(sec){timer.total=Math.max(0,Math.floor(sec));timer.remaining=timer.total;$('timerH').value=Math.floor(timer.total/3600);$('timerM').value=Math.floor(timer.total%3600/60);$('timerS').value=timer.total%60;saveRuntimeState(true);renderTimer()}
+function completeTimer(){timer.running=false;timer.remaining=0;syncWakeLock();playSound(prefs.sound);notify('Timer','タイマーが終了しました。');addHistoryEntry('timer',timer.total,`タイマー ${formatCountdown(timer.total)}`);showCompletion('タイマー終了',`${formatCountdown(timer.total)} を完了しました`);saveRuntimeState(true);renderTimer()}
+function tickTimer(){if(timer.running){timer.remaining=Math.max(0,(timer.endAt-Date.now())/1000);if(timer.remaining<=0){completeTimer()}}renderTimer();saveRuntimeState(false)}
+function toggleTimer(){if(timer.running){timer.remaining=Math.max(0,(timer.endAt-Date.now())/1000);timer.running=false;syncWakeLock();saveRuntimeState(true);renderTimer();return}if(timer.remaining<=0)timer.remaining=timer.total;if(timer.remaining<=0)return;timer.endAt=Date.now()+timer.remaining*1000;timer.running=true;syncWakeLock();saveRuntimeState(true);renderTimer()}
+function resetTimer(){timer.running=false;timer.remaining=timer.total;syncWakeLock();saveRuntimeState(true);renderTimer()}
+function renderTimer(){$('timerDisplay').textContent=formatCountdown(timer.remaining);$('timerStart').textContent=timer.running?'Ⅱ 一時停止':'▶ 開始';$('timerStatus').textContent=timer.running?'動作中':'待機中';}
+['timerH','timerM','timerS'].forEach(id=>$(id).addEventListener('input',updateTimerFromInputs));
+$('timerStart').addEventListener('click',toggleTimer);$('timerReset').addEventListener('click',resetTimer);document.querySelectorAll('.quick').forEach(b=>b.addEventListener('click',()=>setTimer(Number(b.dataset.min)*60)));
+
+const sw={running:false,startedAt:0,elapsed:0,lastLap:0,laps:[]};
+function swMs(){return sw.elapsed+(sw.running?Date.now()-sw.startedAt:0)}
+function toggleSW(){if(sw.running){sw.elapsed=swMs();sw.running=false}else{sw.startedAt=Date.now();sw.running=true}syncWakeLock();saveRuntimeState(true);renderStopwatch()}
+function stopSW(){if(!sw.running&&sw.elapsed<=0)return;if(sw.running)sw.elapsed=swMs();sw.running=false;const total=sw.elapsed;if(total>1000){addHistoryEntry('stopwatch',total/1000,'ストップウォッチ');notify('Timer','ストップウォッチを終了しました。');showCompletion('ストップウォッチ終了',formatStopwatch(total));playSound(prefs.sound)}syncWakeLock();saveRuntimeState(true);renderStopwatch()}
+function lapSW(){if(!sw.running)return;const now=swMs(),lap=now-sw.lastLap;sw.lastLap=now;sw.laps.unshift({n:sw.laps.length+1,time:lap,total:now});saveRuntimeState(true);renderStopwatch()}
+function resetSW(){sw.running=false;sw.startedAt=0;sw.elapsed=0;sw.lastLap=0;sw.laps=[];syncWakeLock();saveRuntimeState(true);renderStopwatch()}
+function renderStopwatch(){$('stopwatchDisplay').textContent=formatStopwatch(swMs());$('stopwatchStart').textContent=sw.running?'Ⅱ 一時停止':'▶ 開始';$('stopwatchStatus').textContent=sw.running?'動作中':(sw.elapsed>0?'一時停止中':'待機中');$('laps').innerHTML=sw.laps.length?`<div class="lap lap-head"><span>ラップ</span><span>区間</span><span>合計</span></div>`+sw.laps.map(l=>`<div class="lap"><span>Lap ${l.n}</span><span>${formatStopwatch(l.time)}</span><span>${formatStopwatch(l.total)}</span></div>`).join(''):''}
+$('stopwatchStart').addEventListener('click',toggleSW);$('stopwatchLap').addEventListener('click',lapSW);$('stopwatchStop').addEventListener('click',stopSW);$('stopwatchReset').addEventListener('click',resetSW);
+
+const inter={running:false,phase:'work',round:1,phaseEndAt:0,remaining:1500};
+function interCfg(){return {work:Math.max(1,Number($('workMin').value)||25)*60,rest:Math.max(1,Number($('breakMin').value)||5)*60,rounds:Math.max(1,Number($('rounds').value)||4)}}
+function applyInterCfg(c){$('workMin').value=Math.max(1,Math.min(999,Math.round(c.work/60)));$('breakMin').value=Math.max(1,Math.min(999,Math.round(c.rest/60)));$('rounds').value=Math.max(1,Math.min(99,Math.round(c.rounds)))}
+function resetInterval(){inter.running=false;const c=interCfg();inter.phase='work';inter.round=1;inter.remaining=c.work;inter.phaseEndAt=0;syncWakeLock();saveRuntimeState(true);renderInterval()}
+function toggleInterval(){const c=interCfg();if(inter.running){inter.remaining=Math.max(0,(inter.phaseEndAt-Date.now())/1000);inter.running=false;syncWakeLock();saveRuntimeState(true);renderInterval();return}if(inter.remaining<=0){inter.phase='work';inter.round=1;inter.remaining=c.work}inter.phaseEndAt=Date.now()+inter.remaining*1000;inter.running=true;syncWakeLock();saveRuntimeState(true);renderInterval()}
+function finishInterval(c){inter.running=false;inter.phase='work';inter.round=1;inter.remaining=c.work;inter.phaseEndAt=0;syncWakeLock();playSound(prefs.sound);notify('Timer','インターバルが完了しました。');addHistoryEntry('interval',c.work*c.rounds,'インターバル');showCompletion('インターバル完了',`${c.rounds}ラウンドを完了しました`);saveRuntimeState(true);renderInterval()}
+function tickInterval(){if(!inter.running){renderInterval();return}let remain=(inter.phaseEndAt-Date.now())/1000;const c=interCfg();while(remain<=0){if(inter.phase==='work'){playSound(prefs.sound);notify('Timer','休憩時間です。');inter.phase='break';remain+=c.rest}else{if(inter.round>=c.rounds){finishInterval(c);return}inter.round++;inter.phase='work';remain+=c.work}}inter.remaining=remain;inter.phaseEndAt=Date.now()+remain*1000;renderInterval();saveRuntimeState(false)}
+function advanceIntervalSilently(elapsedSeconds){let remain=inter.remaining-Math.max(0,elapsedSeconds);const c=interCfg();while(remain<=0){if(inter.phase==='work'){inter.phase='break';remain+=c.rest}else{if(inter.round>=c.rounds){return {complete:true,c}}inter.round++;inter.phase='work';remain+=c.work}}inter.remaining=remain;inter.phaseEndAt=Date.now()+remain*1000;inter.running=true;return {complete:false,c}}
+function renderInterval(){const c=interCfg();$('intervalDisplay').textContent=formatCountdown(inter.remaining);$('intervalStart').textContent=inter.running?'Ⅱ 一時停止':'▶ 開始';$('intervalStatus').textContent=inter.running?'動作中':'待機中';$('intervalBadge').textContent=inter.phase==='work'?'WORK':'BREAK';$('intervalRound').textContent=`Round ${inter.round} / ${c.rounds}`;$('intervalStat').textContent=inter.phase==='work'?'WORK':'BREAK';}
+['workMin','breakMin','rounds'].forEach(id=>$(id).addEventListener('input',()=>{if(!inter.running)resetInterval()}));$('intervalStart').addEventListener('click',toggleInterval);$('intervalReset').addEventListener('click',resetInterval);
+
+$('stackAdd').addEventListener('click',()=>{const name=$('stackName').value.trim()||'ブロック';const mins=Math.max(1,Math.min(999,Number($('stackMinutes').value)||0));if(!mins){toast('1分以上で設定してください');return}addStackBlock(name,mins);$('stackName').value=i18nDefaultStackName();$('stackMinutes').value='25';});
+function i18nDefaultStackName(){return '集中'}
+$('stackList').addEventListener('click',e=>{const edit=e.target.closest('[data-stack-edit]'),up=e.target.closest('[data-stack-up]'),down=e.target.closest('[data-stack-down]'),del=e.target.closest('[data-stack-del]');if(edit){editStackBlock(Number(edit.dataset.stackEdit));return}if(up){if(stack.running){toast('実行中は順番を変更できません');return}const i=Number(up.dataset.stackUp);if(i>0){[stackData[i-1],stackData[i]]=[stackData[i],stackData[i-1]];saveStack();renderStackList();renderStackRuntime()}}else if(down){if(stack.running){toast('実行中は順番を変更できません');return}const i=Number(down.dataset.stackDown);if(i<stackData.length-1){[stackData[i+1],stackData[i]]=[stackData[i],stackData[i+1]];saveStack();renderStackList();renderStackRuntime()}}else if(del){if(stack.running){toast('実行中はブロックを削除できません');return}const i=Number(del.dataset.stackDel);stackData.splice(i,1);saveStack();if(!stackData.length)resetStackRuntime();else{stack.index=Math.min(stack.index,stackData.length-1);if(!stack.running)stack.remaining=stackData[stack.index].seconds;renderStackList();renderStackRuntime()}}});
+$('stackStart').addEventListener('click',startStack);$('stackPause').addEventListener('click',pauseStack);$('stackReset').addEventListener('click',resetStack);$('stackFocus').addEventListener('click',toggleFocus);
+$('stackClear').addEventListener('click',()=>{if(!stackData.length){toast('Time Stackは空です');return}openConfirmModal('Time Stackをすべて消去しますか？','作成したブロックをすべて削除します。',()=>{editingStackIndex=-1;$('stackAdd').textContent='＋ ブロックを追加';stackData=[];saveStack();resetStackRuntime();renderStackList();toast('Time Stackを消去しました')});});
+document.querySelectorAll('.stack-template').forEach(b=>b.addEventListener('click',()=>{const values=b.dataset.stackTemplate.split(',').map(Number);applyStackTemplate(values)}));
+
+
+// ===== Phase 5: Schedules / Routines =====
+let schedules=[];
+let routines=[];
+let routineRuntime={running:false,routineId:null,index:0,remaining:0,endAt:0,startedAt:0};
+try{schedules=JSON.parse(localStorage.getItem(SCHEDULE_STORAGE)||'[]');if(!Array.isArray(schedules))schedules=[]}catch{schedules=[]}
+try{routines=JSON.parse(localStorage.getItem(ROUTINE_STORAGE)||'[]');if(!Array.isArray(routines))routines=[]}catch{routines=[]}
+function saveSchedules(){localStorage.setItem(SCHEDULE_STORAGE,JSON.stringify(schedules))}
+function saveRoutines(){localStorage.setItem(ROUTINE_STORAGE,JSON.stringify(routines))}
+function saveRoutineRuntime(){localStorage.setItem(ROUTINE_RUNTIME_STORAGE,JSON.stringify({...routineRuntime,savedAt:Date.now()}))}
+function loadRoutineRuntime(){try{return JSON.parse(localStorage.getItem(ROUTINE_RUNTIME_STORAGE)||'null')}catch{return null}}
+function clearRoutineRuntime(){localStorage.removeItem(ROUTINE_RUNTIME_STORAGE)}
+function routineById(id){return routines.find(r=>r.id===id)||null}
+function routineTotalSeconds(r){return (r?.blocks||[]).reduce((sum,b)=>sum+(Number(b.seconds)||0),0)}
+function scheduleDaysLabel(s){const map={0:'日',1:'月',2:'火',3:'水',4:'木',5:'金',6:'土'};if(s.repeat==='daily')return '毎日';if(s.repeat==='weekdays')return '平日';if(s.repeat==='weekends')return '週末';if(s.repeat==='custom')return (s.days||[]).sort((a,b)=>a-b).map(d=>map[d]).join('・')||'曜日未選択';return s.date?`${s.date} に1回`:'1回のみ'}
+function formatScheduleTime(s){return `${String(Number(s.hour)||0).padStart(2,'0')}:${String(Number(s.minute)||0).padStart(2,'0')}`}
+function dateKeyLocal(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
+function scheduleMinuteKey(s,d=new Date()){return `${s.id}|${dateKeyLocal(d)}|${formatScheduleTime(s)}`}
+function scheduleMatchesDate(s,d){if(s.repeat==='once')return !!s.date&&dateKeyLocal(d)===s.date;if(s.repeat==='daily')return true;if(s.repeat==='weekdays')return d.getDay()>=1&&d.getDay()<=5;if(s.repeat==='weekends')return d.getDay()===0||d.getDay()===6;if(s.repeat==='custom')return (s.days||[]).includes(d.getDay());return false}
+function nextScheduleOccurrence(s,from=new Date()){
+  if(!s?.enabled)return null;
+  const h=Math.max(0,Math.min(23,Number(s.hour)||0)),m=Math.max(0,Math.min(59,Number(s.minute)||0));
+  const base=new Date(from);base.setSeconds(0,0);
+  for(let offset=0;offset<=370;offset++){
+    const d=new Date(base);d.setHours(0,0,0,0);d.setDate(d.getDate()+offset);
+    if(!scheduleMatchesDate(s,d))continue;
+    const candidate=new Date(d);candidate.setHours(h,m,0,0);
+    if(candidate>from)return candidate;
+  }
+  return null;
+}
+function scheduleSummary(s){
+  const action=s.action==='routine'?(routineById(s.routineId)?.name||'削除されたルーティン'): `${Math.max(1,Number(s.minutes)||25)}分タイマー`;
+  return `${scheduleDaysLabel(s)} · ${formatScheduleTime(s)} · ${action}`;
+}
+function startRoutineById(id,source='manual'){
+  const r=routineById(id);
+  if(!r||!r.blocks?.length){toast('このルーティンには実行できるブロックがありません');return false}
+  if(routineRuntime.running){toast('別のルーティンが実行中です');return false}
+  routineRuntime={running:true,routineId:r.id,index:0,remaining:Number(r.blocks[0].seconds)||0,endAt:Date.now()+(Number(r.blocks[0].seconds)||0)*1000,startedAt:Date.now()};
+  saveRoutineRuntime();syncWakeLock();renderRoutineRuntime();
+  if(source==='scheduled')toast(`「${r.name}」を自動開始しました`);else toast(`「${r.name}」を開始しました`);
+  return true;
+}
+function tickRoutine(){
+  if(!routineRuntime.running){renderRoutineRuntime();return}
+  routineRuntime.remaining=Math.max(0,(routineRuntime.endAt-Date.now())/1000);
+  if(routineRuntime.remaining<=0){
+    const r=routineById(routineRuntime.routineId);
+    if(!r){resetRoutineRuntime();return}
+    const done=routineRuntime.index;
+    playSound(prefs.sound);notify('LX Timer Ultra',`${r.name}：${r.blocks?.[done]?.name||'ブロック'}が完了しました。`);
+    if(done>=r.blocks.length-1){
+      const total=routineTotalSeconds(r);addHistoryEntry('routine',total,r.name);showCompletion('ルーティン完了',`${r.name}・${r.blocks.length}ブロック`);resetRoutineRuntime();return;
+    }
+    routineRuntime.index++;routineRuntime.remaining=Number(r.blocks[routineRuntime.index].seconds)||0;routineRuntime.endAt=Date.now()+routineRuntime.remaining*1000;saveRoutineRuntime();renderRoutineRuntime();return;
+  }
+  renderRoutineRuntime();saveRoutineRuntime();
+}
+function pauseRoutine(){
+  if(!routineRuntime.running){
+    const r=routineById(routineRuntime.routineId);if(!r)return; if(routineRuntime.remaining<=0)routineRuntime.remaining=Number(r.blocks[routineRuntime.index]?.seconds)||0;routineRuntime.endAt=Date.now()+routineRuntime.remaining*1000;routineRuntime.running=true;saveRoutineRuntime();syncWakeLock();renderRoutineRuntime();return;
+  }
+  routineRuntime.remaining=Math.max(0,(routineRuntime.endAt-Date.now())/1000);routineRuntime.running=false;routineRuntime.endAt=0;saveRoutineRuntime();syncWakeLock();renderRoutineRuntime();
+}
+function resetRoutineRuntime(){routineRuntime={running:false,routineId:null,index:0,remaining:0,endAt:0,startedAt:0};clearRoutineRuntime();syncWakeLock();renderRoutineRuntime()}
+function restoreRoutineRuntime(){
+  const st=loadRoutineRuntime();if(!st||!routines.length)return;
+  const r=routineById(st.routineId);if(!r||!r.blocks?.length){clearRoutineRuntime();return}
+  routineRuntime={running:false,routineId:r.id,index:Math.max(0,Math.min(r.blocks.length-1,Number(st.index)||0)),remaining:Math.max(0,Number(st.remaining)||Number(r.blocks[Math.max(0,Math.min(r.blocks.length-1,Number(st.index)||0))].seconds)||0),endAt:0,startedAt:Number(st.startedAt)||0};
+  if(st.running){const elapsed=Math.max(0,(Date.now()-(Number(st.savedAt)||Date.now()))/1000);routineRuntime.remaining=Math.max(0,routineRuntime.remaining-elapsed);if(routineRuntime.remaining>0){routineRuntime.running=true;routineRuntime.endAt=Date.now()+routineRuntime.remaining*1000}else{clearRoutineRuntime();routineRuntime={running:false,routineId:null,index:0,remaining:0,endAt:0,startedAt:0}}}
+  renderRoutineRuntime();
+}
+function renderRoutineSource(){
+  const el=$('routineSourcePreview');if(!el)return;
+  if(!stackData.length){el.textContent='現在のTime Stackは空です。先にTime Stackでブロックを作ってください。';$('routineSave').disabled=true;return}
+  $('routineSave').disabled=false;el.innerHTML=`現在の構成：${stackData.map((b,i)=>`${i+1}. ${escapeHtml(b.name)} ${formatCountdown(b.seconds)}`).join('  →  ')}（合計 ${formatCountdown(stackTotalSeconds())}）`;
+}
+function renderRoutineRuntime(){
+  const box=$('routineRuntime');if(!box)return;
+  if(!routineRuntime.routineId){box.hidden=true;return}
+  const r=routineById(routineRuntime.routineId);if(!r){box.hidden=true;return}
+  const i=Math.min(routineRuntime.index,r.blocks.length-1),b=r.blocks[i];const remain=Math.max(0,routineRuntime.running?(routineRuntime.endAt-Date.now())/1000:routineRuntime.remaining);routineRuntime.remaining=remain;box.hidden=false;$('routineRuntimeName').textContent=r.name;$('routineRuntimePhase').textContent=`${i+1} / ${r.blocks.length}`;$('routineRuntimeBlock').textContent=b?.name||'ブロック';$('routineRuntimeTime').textContent=formatCountdown(remain);const total=Number(b?.seconds)||1;$('routineRuntimeProgress').style.width=`${Math.max(0,Math.min(100,(1-remain/total)*100))}%`;$('routineRuntimeMeta').textContent=routineRuntime.running?`${r.blocks.length-(i+1)}ブロック待機中`:`${r.blocks.length-(i+1)}ブロック待機中 · 一時停止`;$('routinePause').textContent=routineRuntime.running?'Ⅱ 一時停止':'▶ 再開';
+}
+function renderRoutines(){
+  const el=$('routineList');if(!el)return;
+  renderRoutineSource();
+  if(!routines.length){el.innerHTML='<div class="empty-automation">まだルーティンがありません。Time Stackを作って保存してください。</div>';$('scheduleRoutine').innerHTML='<option value="">ルーティンがありません</option>';return}
+  $('scheduleRoutine').innerHTML=routines.map(r=>`<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+  el.innerHTML=routines.map(r=>`<div class="routine-card"><div><div class="automation-card-top"><span class="automation-name">${escapeHtml(r.name)}</span><span class="badge">${r.blocks.length}ブロック</span></div><div class="automation-meta">${r.blocks.map(b=>`${escapeHtml(b.name)} ${formatCountdown(b.seconds)}`).join(' → ')}</div><div class="automation-next">合計 ${formatCountdown(routineTotalSeconds(r))}</div></div><div class="automation-actions"><button class="ghost" data-routine-run="${r.id}" type="button">▶ 実行</button><button class="ghost" data-routine-load="${r.id}" type="button">Stackへ</button><button class="ghost" data-routine-del="${r.id}" type="button">削除</button></div></div>`).join('');
+}
+function renderSchedules(){
+  const el=$('scheduleList');if(!el)return;
+  if(!schedules.length){el.innerHTML='<div class="empty-automation">まだスケジュールがありません。上で時刻と開始内容を設定してください。</div>';return}
+  el.innerHTML=schedules.map(s=>{const next=s.enabled?nextScheduleOccurrence(s,new Date()):null;const broken=s.action==='routine'&&!routineById(s.routineId);return `<div class="schedule-card"><div><div class="automation-card-top"><span class="automation-name">${escapeHtml(s.name)}</span><span class="badge">${s.action==='routine'?'ROUTINE':'TIMER'}</span>${broken?'<span class="badge">要確認</span>':''}</div><div class="automation-meta">${escapeHtml(scheduleSummary(s))}${broken?' · ルーティンが見つかりません':''}</div><div class="automation-next">次回：${next?next.toLocaleString('ja-JP',{month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit'}):s.repeat==='once'?'完了済み':'—'}</div></div><div class="automation-actions"><button class="toggle-mini ${s.enabled?'on':''}" data-schedule-toggle="${s.id}" type="button">${s.enabled?'ON':'OFF'}</button><button class="ghost" data-schedule-del="${s.id}" type="button">削除</button></div></div>`}).join('');
+}
+function renderAutomation(){
+  const schedulesVisible=automationTab==='schedules';$('automationSchedulesPanel').hidden=!schedulesVisible;$('automationRoutinesPanel').hidden=schedulesVisible;$('automationTabSchedules').classList.toggle('active',schedulesVisible);$('automationTabRoutines').classList.toggle('active',!schedulesVisible);renderSchedules();renderRoutines();renderRoutineRuntime();
+}
+function scheduleFormSync(){
+  const repeat=$('scheduleRepeat').value, action=$('scheduleAction').value;
+  $('scheduleDateRow').hidden=repeat!=='once';$('scheduleDaysRow').hidden=repeat!=='custom';$('scheduleTimerRow').hidden=action!=='timer';$('scheduleRoutineRow').hidden=action!=='routine';
+  if(action==='routine')renderRoutines();
+}
+function scheduleDaySelection(){return [...document.querySelectorAll('[data-schedule-day].active')].map(b=>Number(b.dataset.scheduleDay))}
+function addSchedule(){
+  const repeat=$('scheduleRepeat').value;const name=$('scheduleName').value.trim()||'スケジュール';const hour=Math.max(0,Math.min(23,Number($('scheduleH').value)||0));const minute=Math.max(0,Math.min(59,Number($('scheduleM').value)||0));const action=$('scheduleAction').value;const date=$('scheduleDate').value;
+  if(repeat==='once'&&!date){toast('実行日を指定してください');return}
+  const days=scheduleDaySelection();if(repeat==='custom'&&!days.length){toast('曜日を1つ以上選択してください');return}
+  if(action==='routine'&&!routineById($('scheduleRoutine').value)){toast('開始するルーティンを選択してください');return}
+  const minutes=Math.max(1,Math.min(999,Math.round(Number($('scheduleMinutes').value)||25)));
+  schedules.push({id:`sch_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,name,hour,minute,repeat,date:repeat==='once'?date:'',days:repeat==='custom'?days:[],action,minutes,routineId:action==='routine'?$('scheduleRoutine').value:null,enabled:true,lastRunKey:''});saveSchedules();renderSchedules();toast('スケジュールを追加しました');
+}
+function runSchedule(s,now=new Date()){
+  const key=scheduleMinuteKey(s,now);if(s.lastRunKey===key)return;
+  if(s.action==='timer'){
+    if(timer.running){toast(`「${s.name}」は実行を見送りました（通常タイマーが動作中）`);s.lastRunKey=key;saveSchedules();return}
+    setTimer(Math.max(1,Number(s.minutes)||25)*60);toggleTimer();toast(`「${s.name}」を自動開始しました`);
+  }else{
+    if(!startRoutineById(s.routineId,'scheduled')){s.lastRunKey=key;saveSchedules();return}
+  }
+  s.lastRunKey=key;if(s.repeat==='once')s.enabled=false;saveSchedules();renderSchedules();
+}
+function tickSchedules(){
+  if(!schedules.length)return;
+  const now=new Date();
+  schedules.forEach(s=>{if(!s.enabled)return;if(!scheduleMatchesDate(s,now))return;if(Number(s.hour)!==now.getHours()||Number(s.minute)!==now.getMinutes())return;runSchedule(s,now)});
+}
+$('automationTabSchedules').addEventListener('click',()=>{automationTab='schedules';renderAutomation()});$('automationTabRoutines').addEventListener('click',()=>{automationTab='routines';renderAutomation()});$('scheduleRepeat').addEventListener('change',scheduleFormSync);$('scheduleAction').addEventListener('change',scheduleFormSync);document.querySelectorAll('[data-schedule-day]').forEach(b=>b.addEventListener('click',()=>{b.classList.toggle('active')}));$('scheduleAdd').addEventListener('click',addSchedule);
+$('scheduleList').addEventListener('click',e=>{const t=e.target.closest('[data-schedule-toggle]'),d=e.target.closest('[data-schedule-del]');if(t){const s=schedules.find(x=>x.id===t.dataset.scheduleToggle);if(s){s.enabled=!s.enabled;saveSchedules();renderSchedules();toast(s.enabled?'スケジュールをONにしました':'スケジュールをOFFにしました')}}if(d){schedules=schedules.filter(x=>x.id!==d.dataset.scheduleDel);saveSchedules();renderSchedules();toast('スケジュールを削除しました')}});
+$('routineSave').addEventListener('click',()=>{if(!stackData.length){toast('Time Stackが空です');return}const name=$('routineName').value.trim()||'ルーティン';routines.push({id:`routine_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,name,blocks:stackData.map(b=>({name:b.name,seconds:Number(b.seconds)||0}))});saveRoutines();renderRoutines();toast('ルーティンを保存しました')});
+$('routineList').addEventListener('click',e=>{const run=e.target.closest('[data-routine-run]'),load=e.target.closest('[data-routine-load]'),del=e.target.closest('[data-routine-del]');if(run){startRoutineById(run.dataset.routineRun);return}if(load){const r=routineById(load.dataset.routineLoad);if(r){stackData=r.blocks.map(b=>({name:b.name,seconds:b.seconds}));saveStack();resetStackRuntime();renderStackList();renderStackRuntime();toast('ルーティンをTime Stackへ読み込みました')}}if(del){const id=del.dataset.routineDel;routines=routines.filter(r=>r.id!==id);schedules=schedules.map(s=>s.routineId===id?{...s,enabled:false}:s);saveRoutines();saveSchedules();if(routineRuntime.routineId===id)resetRoutineRuntime();renderAutomation();toast('ルーティンを削除しました')}});
+$('routinePause').addEventListener('click',pauseRoutine);$('routineReset').addEventListener('click',resetRoutineRuntime);$('routineFocus').addEventListener('click',toggleFocus);
+renderAutomation();scheduleFormSync();restoreRoutineRuntime();
+
+function saveRuntimeState(force=false){
+  const now=Date.now();
+  if(!force && now-lastRuntimeSave<900)return;
+  lastRuntimeSave=now;
+  const state={
+    mode,
+    savedAt:now,
+    timer:{total:timer.total,remaining:timer.running?Math.max(0,(timer.endAt-now)/1000):timer.remaining,running:timer.running,endAt:timer.endAt},
+    sw:{running:sw.running,startedAt:sw.startedAt,elapsed:sw.running?swMs():sw.elapsed,lastLap:sw.lastLap,laps:sw.laps},
+    inter:{running:inter.running,phase:inter.phase,round:inter.round,remaining:inter.running?Math.max(0,(inter.phaseEndAt-now)/1000):inter.remaining,phaseEndAt:inter.phaseEndAt,config:interCfg()},
+    stack:{running:stack.running,index:stack.index,remaining:stack.running?Math.max(0,(stack.endAt-now)/1000):stack.remaining,endAt:stack.endAt,startedAt:stack.startedAt},
+    routine:{running:routineRuntime.running,routineId:routineRuntime.routineId,index:routineRuntime.index,remaining:routineRuntime.running?Math.max(0,(routineRuntime.endAt-now)/1000):routineRuntime.remaining,endAt:routineRuntime.endAt,startedAt:routineRuntime.startedAt}
+  };
+  localStorage.setItem(RUNTIME_STORAGE,JSON.stringify(state));
+}
+function loadRuntimeState(){try{return JSON.parse(localStorage.getItem(RUNTIME_STORAGE)||'null')}catch{return null}}
+function clearRuntimeState(){localStorage.removeItem(RUNTIME_STORAGE)}
+function restoreRuntimeState(){
+  const st=loadRuntimeState();
+  if(!st)return;
+  const now=Date.now();
+  if(st.mode&&['home','timer','stopwatch','interval','multi','stack','smart','clock'].includes(st.mode))mode=st.mode;
+  if(st.timer){Object.assign(timer,st.timer)}
+  if(st.sw){Object.assign(sw,st.sw)}
+  if(st.inter){
+    Object.assign(inter,st.inter);
+    if(st.inter.config)applyInterCfg(st.inter.config);
+  }
+  if(timer.running&&timer.endAt<=now){timer.remaining=0;completeTimer()}
+  else if(timer.running){timer.remaining=Math.max(0,(timer.endAt-now)/1000)}
+  if(sw.running){
+    const savedAt=Number(st.savedAt)||now;
+    sw.elapsed=Math.max(0,sw.elapsed+(now-savedAt));
+    sw.startedAt=now;
+  }
+  if(inter.running){
+    const savedAt=Number(st.savedAt)||now;
+    const elapsedSinceSave=Math.max(0,(now-savedAt)/1000);
+    const result=advanceIntervalSilently(elapsedSinceSave);
+    if(result?.complete){finishInterval(result.c)}
+  }
+  if(st.stack && stackData.length){
+    stack.index=Math.max(0,Math.min(stackData.length-1,Number(st.stack.index)||0));
+    stack.remaining=Math.max(0,Number(st.stack.remaining)||stackData[stack.index].seconds);
+    stack.startedAt=Number(st.stack.startedAt)||0;
+    if(st.stack.running){
+      const elapsed=(now-(Number(st.savedAt)||now))/1000;
+      stack.remaining=Math.max(0,stack.remaining-elapsed);
+      if(stack.remaining>0){stack.endAt=now+stack.remaining*1000;stack.running=true}else{stack.running=false;resetStackRuntime()}
+    }
+  }
+  setMode(mode);
+}
+window.addEventListener('beforeunload',()=>saveRuntimeState(true));
+
+let audioCtx=null;
+function ac(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();return audioCtx}
+function soundFactor(){return prefs.soundLength==='short'?.72:prefs.soundLength==='long'?1.45:1}
+function tone(ctx,when,freq,dur,type='sine',gain=.2){const osc=ctx.createOscillator(),g=ctx.createGain();const d=dur*soundFactor();osc.type=type;osc.frequency.setValueAtTime(freq,when);g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(gain*Number(prefs.volume)/100,when+.02);g.gain.exponentialRampToValueAtTime(.001,when+d);osc.connect(g);g.connect(ctx.destination);osc.start(when);osc.stop(when+d+.03)}
+function playSound(kind){if(kind==='none')return;try{const ctx=ac();ctx.resume();const n=ctx.currentTime+.02;const rep=Math.max(1,Math.min(3,Number(prefs.soundRepeat)||1));for(let r=0;r<rep;r++){const off=r*(prefs.soundLength==='long'?1.9:1.05);if(kind==='soft'){tone(ctx,n+off,660,.45,'sine',.16);tone(ctx,n+off+.18,880,.55,'sine',.14);tone(ctx,n+off+.38,1046,.75,'sine',.12)}else if(kind==='chime'){[523,659,784,1046].forEach((f,i)=>tone(ctx,n+off+i*.18,f,.7,'sine',.12))}else if(kind==='digital'){[880,880,660].forEach((f,i)=>tone(ctx,n+off+i*.12,f,.12,'square',.07))}else if(kind==='long'){tone(ctx,n+off,660,1.8,'sine',.14);tone(ctx,n+off+.35,880,1.55,'sine',.10)}else if(kind==='alarm'){for(let i=0;i<6;i++)tone(ctx,n+off+i*.18,i%2?900:650,.12,'square',.08)}}}catch{}}
+
+let wakeLock=null;
+function updateWakeButton(){const on=!!prefs.wakeLock;const supported='wakeLock' in navigator;$('wakeToggle').classList.toggle('on',on&&supported);$('wakeLabel').textContent=!supported?'非対応':on?'ON':'OFF';$('wakeDesc').textContent=supported?'対応ブラウザでは、タイマー動作中の画面スリープを防ぎます。':'このブラウザでは画面スリープ防止に対応していません。'}
+function notificationState(){
+  if(!('Notification' in window))return {supported:false,permission:'unsupported',enabled:false};
+  const permission=Notification.permission;
+  return {supported:true,permission,enabled:permission==='granted' && prefs.notifications!==false};
+}
+function updateNotificationButton(){
+  const s=notificationState();
+  const btn=$('notificationToggle');
+  btn.classList.toggle('on',s.enabled);
+  if(!s.supported){$('notificationLabel').textContent='非対応';$('notificationDesc').textContent='このブラウザではブラウザ通知に対応していません。';return}
+  if(s.permission==='denied'){$('notificationLabel').textContent='ブロック';$('notificationDesc').textContent='ブラウザ側で通知がブロックされています。ブラウザのサイト設定から通知を許可してください。';return}
+  if(s.enabled){$('notificationLabel').textContent='ON';$('notificationDesc').textContent='ブラウザ通知は有効です。タイマー終了時に通知します。';return}
+  $('notificationLabel').textContent='OFF';
+  $('notificationDesc').textContent=s.permission==='default'?'ONにするとブラウザ通知の許可を求めます。':'通知は許可されていますが、アプリ側ではOFFです。';
+}
+async function toggleNotifications(){
+  if(!('Notification' in window)){updateNotificationButton();toast('このブラウザは通知に対応していません');return}
+  if(Notification.permission==='granted'){
+    const next=!notificationState().enabled;
+    prefs.notifications=next;
+    prefs.notificationOptOut=!next;
+    savePrefs();
+    updateNotificationButton();
+    toast(next?'ブラウザ通知をONにしました':'ブラウザ通知をOFFにしました');
+    return;
+  }
+  if(Notification.permission==='denied'){updateNotificationButton();toast('ブラウザ側で通知がブロックされています');return}
+  try{
+    const p=await Notification.requestPermission();
+    prefs.notifications=p==='granted';
+    prefs.notificationOptOut=p!=='granted';
+    savePrefs();
+    updateNotificationButton();
+    if(p==='granted')toast('ブラウザ通知をONにしました');
+    else if(p==='denied')toast('通知がブロックされました');
+    else toast('通知の許可はまだ行われていません');
+  }catch(err){prefs.notifications=false;savePrefs();updateNotificationButton();toast('通知の許可を取得できませんでした');}
+}
+function testNotification(){
+  if(!('Notification' in window)){toast('このブラウザは通知に対応していません');return}
+  if(Notification.permission==='denied'){toast('ブラウザ側で通知がブロックされています');updateNotificationButton();return}
+  if(Notification.permission==='default'){
+    toast('先に「ブラウザ通知」をONにしてください');
+    updateNotificationButton();
+    return;
+  }
+  // 権限が許可済みなら、アプリ側の古い保存状態に関係なくONへ同期して送信
+  prefs.notifications=true;
+  prefs.notificationOptOut=false;
+  savePrefs();
+  updateNotificationButton();
+  try{new Notification('LX Timer Ultra',{body:'ブラウザ通知は正常に動作しています。'});toast('テスト通知を送信しました')}catch{toast('通知を送信できませんでした')}
+}
+async function requestWakeLock(){if(!prefs.wakeLock||!('wakeLock' in navigator))return;try{wakeLock=await navigator.wakeLock.request('screen')}catch{}}
+function releaseWakeLock(){if(wakeLock){wakeLock.release().catch(()=>{});wakeLock=null}}
+function syncWakeLock(){if((timer.running||sw.running||inter.running||multiRunningCount()>0||routineRuntime.running)&&prefs.wakeLock)requestWakeLock();else if(!timer.running&&!sw.running&&!inter.running&&multiRunningCount()===0&&!routineRuntime.running)releaseWakeLock()}
+
+function toast(msg){$('toastText').textContent=msg;$('toast').classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>$('toast').classList.remove('show'),2400)}
+
+const HISTORY_STORAGE='timer_v6_history';
+let historyData=[];
+try{historyData=JSON.parse(localStorage.getItem(HISTORY_STORAGE)||'[]')}catch{historyData=[]}
+function saveHistory(){localStorage.setItem(HISTORY_STORAGE,JSON.stringify(historyData.slice(0,200)))}
+function addHistoryEntry(mode,seconds,label){if(!seconds||seconds<1)return;historyData.unshift({id:Date.now()+Math.random(),mode,seconds:Math.round(seconds),label:label||mode,date:new Date().toISOString()});historyData=historyData.slice(0,200);saveHistory()}
+function historyMinutes(sum){return Math.round(sum/60)}
+function renderHistory(){const now=Date.now();const todayLocal=new Date().toLocaleDateString('ja-JP');const weekAgo=now-7*86400000;const today=historyData.filter(x=>new Date(x.date).toLocaleDateString('ja-JP')===todayLocal).reduce((a,x)=>a+x.seconds,0);const week=historyData.filter(x=>Date.parse(x.date)>=weekAgo).reduce((a,x)=>a+x.seconds,0);const total=historyData.reduce((a,x)=>a+x.seconds,0);const avg=historyData.length?total/historyData.length:0;$('statToday').textContent=historyMinutes(today)+'分';$('statWeek').textContent=historyMinutes(week)+'分';$('statSessions').textContent=historyData.length;$('statAverage').textContent=historyMinutes(avg)+'分';const chart=$('weeklyChart');const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);const key=d.toLocaleDateString('ja-JP');const sec=historyData.filter(x=>new Date(x.date).toLocaleDateString('ja-JP')===key).reduce((a,x)=>a+x.seconds,0);days.push({d,sec})}const max=Math.max(1,...days.map(x=>x.sec));chart.innerHTML=days.map(x=>`<div class="day-bar"><div class="day-value">${x.sec?historyMinutes(x.sec)+'m':'—'}</div><div class="day-fill" style="--bar-h:${Math.max(3,(x.sec/max)*92)}px"></div><div class="day-label">${x.d.toLocaleDateString('ja-JP',{weekday:'short'}).replace('曜日','')}</div></div>`).join('');const el=$('historyList');if(!historyData.length){el.innerHTML='<div class="empty-history">まだ記録がありません。</div>';return}el.innerHTML=historyData.slice(0,30).map(x=>{const d=new Date(x.date);const date=d.toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});const icon=x.mode==='timer'?'◷':x.mode==='stopwatch'?'⏱':x.mode==='stack'?'▤':'↻';const modeLabel=x.mode==='timer'?'タイマー':x.mode==='stopwatch'?'ストップウォッチ':x.mode==='stack'?'Time Stack':'インターバル';return `<div class="history-item"><div class="history-icon">${icon}</div><div><div class="history-name">${escapeHtml(x.label)}</div><div class="history-meta">${date} · ${modeLabel}</div></div><div class="history-time">${formatCountdown(x.seconds)}</div></div>`}).join('')}
+function openHistory(){$('historyModal').classList.add('show');renderHistory()}
+function closeHistory(){$('historyModal').classList.remove('show');syncNavigation(mode)}
+function showCompletion(title,sub){$('completeTitle').textContent=title;$('completeSub').textContent=sub||'';$('completeOverlay').classList.add('show');$('completeOverlay').setAttribute('aria-hidden','false')}
+function closeCompletion(){$('completeOverlay').classList.remove('show');$('completeOverlay').setAttribute('aria-hidden','true')}
+let focusMode=false;
+async function setFocusMode(on){focusMode=on;document.body.classList.toggle('focus-mode',on);$('focusBtn').innerHTML=on?'⛶ <span>終了</span>':'⛶ <span>集中</span>';['timerFocus','stopwatchFocus','intervalFocus','stackFocus'].forEach(id=>$(id).textContent=on?'⛶ 終了':'⛶ 集中');if(on&&document.documentElement.requestFullscreen){try{await document.documentElement.requestFullscreen()}catch{}}else if(!on&&document.fullscreenElement){try{await document.exitFullscreen()}catch{}}}
+function toggleFocus(){setFocusMode(!focusMode)}
+
+
+function timerInputSeconds(){const h=Math.max(0,Number($('timerH').value)||0),m=Math.max(0,Math.min(59,Number($('timerM').value)||0)),sec=Math.max(0,Math.min(59,Number($('timerS').value)||0));return h*3600+m*60+sec}
+$('saveFavorite').addEventListener('click',()=>{const seconds=timerInputSeconds();if(seconds<=0){toast('時間を1秒以上に設定してください');return}openTextModal('お気に入りの名前','このタイマーに名前を付けてください。',formatCountdown(seconds),(name)=>{if(!name.trim())return;favorites.unshift({name:name.trim(),seconds});favorites=favorites.slice(0,12);saveFavorites();renderFavorites();toast('お気に入りに保存しました')});});
+$('favoriteList').addEventListener('click',e=>{const main=e.target.closest('[data-fav]');if(main){const f=favorites[Number(main.dataset.fav)];if(f)setTimer(f.seconds);return}const del=e.target.closest('[data-del-fav]');if(del){favorites.splice(Number(del.dataset.delFav),1);saveFavorites();renderFavorites()}});
+$('addWorldZone').addEventListener('click',()=>{const z=$('worldZoneSelect').value;if(!z||worldZones.includes(z))return;worldZones.push(z);saveWorldZones();renderWorldClocks()});
+$('worldClockList').addEventListener('click',e=>{const b=e.target.closest('[data-del-world]');if(!b)return;if(worldZones.length<=1){toast('世界時計は1地域以上残してください');return}worldZones.splice(Number(b.dataset.delWorld),1);saveWorldZones();renderWorldClocks()});
+function renderHome(){const el=$('homeRunning');if(!el)return;const items=[];if(timer.running)items.push({label:'タイマー',name:formatCountdown(timer.remaining),time:formatCountdown(timer.remaining),state:'動作中',target:'timer',active:true});else if(timer.total>0)items.push({label:'タイマー',name:'待機中',time:formatCountdown(timer.total),state:'待機中',target:'timer',active:false});if(sw.running)items.push({label:'ストップウォッチ',name:'計測中',time:formatStopwatch(swMs()),state:'動作中',target:'stopwatch',active:true});if(stack.running&&stackData[stack.index])items.push({label:'Time Stack',name:stackData[stack.index].name,time:formatCountdown(stack.remaining),state:`${stack.index+1} / ${stackData.length}`,target:'stack',active:true});if(routineRuntime.running&&routineById(routineRuntime.routineId)){const rr=routineById(routineRuntime.routineId);items.push({label:'ルーティン',name:rr.name,time:formatCountdown(routineRuntime.remaining),state:`${routineRuntime.index+1} / ${rr.blocks.length}`,target:'automation',active:true})}if(smart.running)items.push({label:'Smart Timer',name:smart.mode==='duration'?'あと時間':'終了時刻',time:formatCountdown(smart.remaining),state:'動作中',target:'smart',active:true});if(!items.length)items.push({label:'ステータス',name:'現在動作中のタイマーはありません',time:'—',state:'待機中',target:'timer',active:false});el.innerHTML=items.map(x=>`<button class="home-running-card ${x.active?'active':''}" data-home-target="${x.target}"><div class="home-running-label">${escapeHtml(x.label)}</div><div class="home-running-name">${escapeHtml(x.name)}</div><div class="home-running-time">${x.time}</div><div class="home-running-state">${escapeHtml(x.state)}</div></button>`).join('');el.querySelectorAll('[data-home-target]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.homeTarget)));$('homeClock').textContent=fmtClock(new Date())}
+function renderAll(){renderClock();renderTimer();renderStopwatch();renderInterval();renderMulti();renderFavorites();renderWorldClocks();renderStackList();renderStackRuntime();renderSmart();renderAutomation();renderHome()}
+setInterval(()=>{renderClock();renderWorldClocks();tickTimer();tickInterval();tickMulti();tickStack();tickSmart();tickRoutine();tickSchedules();renderStopwatch()},250);
+document.addEventListener('visibilitychange',()=>{renderAll();if(document.visibilityState==='visible')syncWakeLock()});
+
+
+let modalResolver=null;
+function openTextModal(title,desc,initial,onDone){$('textModalTitle').textContent=title;$('textModalDesc').textContent=desc;$('textModalInput').value=initial||'';modalResolver=onDone; $('textModal').classList.add('show');setTimeout(()=>$('textModalInput').focus(),30)}
+function closeTextModal(result,cancel=false){$('textModal').classList.remove('show');const fn=modalResolver;modalResolver=null;if(fn&&!cancel)fn(String(result??''))}
+let confirmResolver=null;
+function openConfirmModal(title,desc,onYes){$('confirmModalTitle').textContent=title;$('confirmModalDesc').textContent=desc;confirmResolver=onYes;$('confirmModal').classList.add('show')}
+function closeConfirmModal(yes=false){$('confirmModal').classList.remove('show');const fn=confirmResolver;confirmResolver=null;if(yes&&fn)fn()}
+$('textModalOk').addEventListener('click',()=>closeTextModal($('textModalInput').value));$('textModalCancel').addEventListener('click',()=>closeTextModal('',true));$('textModalClose').addEventListener('click',()=>closeTextModal('',true));$('textModal').addEventListener('click',e=>{if(e.target===$('textModal'))closeTextModal('',true)});
+$('confirmModalOk').addEventListener('click',()=>closeConfirmModal(true));$('confirmModalCancel').addEventListener('click',()=>closeConfirmModal(false));$('confirmModalClose').addEventListener('click',()=>closeConfirmModal(false));$('confirmModal').addEventListener('click',e=>{if(e.target===$('confirmModal'))closeConfirmModal(false)});
+
+let activeNumpadInput=null, numpadDraft='', numpadJustOpened=false;
+function mobileNumpadEnabled(){return window.matchMedia('(max-width:900px)').matches && (window.matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window)}
+function openNumpad(input){activeNumpadInput=input;numpadDraft=String(input.value||'');numpadJustOpened=true;$('numpadTitle').textContent=input.closest('.field')?.querySelector('label')?.textContent||'数字入力';$('numpadValue').textContent=numpadDraft||'0';$('numpadBackdrop').classList.add('show');$('numpadBackdrop').setAttribute('aria-hidden','false')}
+function closeNumpad(commit=false){if(activeNumpadInput&&commit){activeNumpadInput.value=numpadDraft||'0';activeNumpadInput.dispatchEvent(new Event('input',{bubbles:true}));activeNumpadInput.dispatchEvent(new Event('change',{bubbles:true}))}$('numpadBackdrop').classList.remove('show');$('numpadBackdrop').setAttribute('aria-hidden','true');activeNumpadInput=null;numpadDraft='';numpadJustOpened=false}
+function clampNumpadValue(input,n){const id=input.id;let min=0,max=999;if(id==='timerH')max=99;if(id==='timerM'||id==='timerS')max=59;if(id==='rounds')max=99;if(id==='workMin'||id==='breakMin'||id==='stackMinutes')min=1;if(id==='smartEndH')max=23;if(id==='smartEndM')max=59;return Math.max(min,Math.min(max,n))}
+function pushNumpadDigit(d){if(!activeNumpadInput)return;if(numpadJustOpened){numpadDraft='';numpadJustOpened=false}let next=(numpadDraft||'')+d;next=next.replace(/^0+(?=\d)/,'');if(next.length>3)next=next.slice(-3);numpadDraft=String(clampNumpadValue(activeNumpadInput,Number(next)||0));if(Number(numpadDraft)!==(Number(next)||0))toast('入力できる範囲を超えています');$('numpadValue').textContent=numpadDraft||'0'}
+$('numpadBackdrop').addEventListener('click',e=>{if(e.target===$('numpadBackdrop'))closeNumpad(false)});
+document.querySelectorAll('.numpad-key').forEach(b=>b.addEventListener('click',()=>{const key=b.dataset.key;if(key==='done')closeNumpad(true);else if(key==='cancel')closeNumpad(false);else if(key==='clear'){numpadDraft='';$('numpadValue').textContent='0'}else if(key==='backspace'){numpadDraft=numpadDraft.slice(0,-1);$('numpadValue').textContent=numpadDraft||'0'}else pushNumpadDigit(key)}));
+document.querySelectorAll('[data-numpad="true"]').forEach(input=>input.addEventListener('click',()=>{if(mobileNumpadEnabled())openNumpad(input)}));
+function syncNativeNumericInputs(){const mobile=mobileNumpadEnabled();document.querySelectorAll('.lx-number').forEach(input=>{input.readOnly=mobile;input.setAttribute('inputmode',mobile?'none':'decimal')})}
+window.addEventListener('resize',syncNativeNumericInputs);window.addEventListener('orientationchange',()=>setTimeout(syncNativeNumericInputs,60));
+const modal=$('settingsModal');
+$('settingsBtn').addEventListener('click',()=>modal.classList.add('show'));$('closeSettings').addEventListener('click',()=>modal.classList.remove('show'));modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('show')});
+$('accentSelect').addEventListener('change',e=>{prefs.accent=e.target.value;savePrefs()});$('themeSelect').addEventListener('change',e=>{prefs.theme=e.target.value;savePrefs()});$('zoneSelect').addEventListener('change',e=>{prefs.zone=e.target.value;savePrefs();renderClock()});$('soundSelect').addEventListener('change',e=>{prefs.sound=e.target.value;savePrefs()});$('soundLength').addEventListener('change',e=>{prefs.soundLength=e.target.value;savePrefs()});$('soundRepeat').addEventListener('change',e=>{prefs.soundRepeat=Number(e.target.value);savePrefs()});$('volumeRange').addEventListener('input',e=>{prefs.volume=Number(e.target.value);$('volumeValue').textContent=prefs.volume;document.documentElement.style.setProperty('--range-pct',`${prefs.volume}%`);localStorage.setItem(STORAGE,JSON.stringify(prefs))});$('hourMode').addEventListener('change',e=>{prefs.hourMode=e.target.value;savePrefs();renderClock();renderWorldClocks()});$('wakeToggle').addEventListener('click',()=>{if(!('wakeLock' in navigator)){updateWakeButton();return}prefs.wakeLock=!prefs.wakeLock;savePrefs();updateWakeButton();syncWakeLock()});$('notificationToggle').addEventListener('click',toggleNotifications);$('testNotification').addEventListener('click',testNotification);$('testSound').addEventListener('click',()=>playSound(prefs.sound));
+
+$('closeHistory').addEventListener('click',closeHistory);$('historyModal').addEventListener('click',e=>{if(e.target===$('historyModal'))closeHistory()});$('clearHistory').addEventListener('click',()=>{if(!historyData.length){toast('履歴はありません');return}openConfirmModal('履歴をすべて削除しますか？','完了した記録をすべて削除します。',()=>{historyData=[];saveHistory();renderHistory();toast('履歴を削除しました')});});$('closeComplete').addEventListener('click',closeCompletion);$('completeOverlay').addEventListener('click',e=>{if(e.target===$('completeOverlay'))closeCompletion()});$('focusBtn').addEventListener('click',toggleFocus);$('timerFocus').addEventListener('click',toggleFocus);$('stopwatchFocus').addEventListener('click',toggleFocus);$('intervalFocus').addEventListener('click',toggleFocus);document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&focusMode)setFocusMode(false)});
+
+document.addEventListener('keydown',e=>{const tag=document.activeElement?.tagName;if(e.key==='Escape'){modal.classList.remove('show');closeHistory();closeCompletion();if(focusMode)setFocusMode(false);}if(['INPUT','SELECT','TEXTAREA'].includes(tag))return;if(e.code==='Space'){e.preventDefault();if(mode==='timer')toggleTimer();else if(mode==='stopwatch')toggleSW();else if(mode==='interval')toggleInterval();else if(mode==='multi')startAllMulti();else if(mode==='stack')pauseStack();else if(mode==='automation')pauseRoutine()}if(e.key.toLowerCase()==='r'){if(mode==='timer')resetTimer();else if(mode==='stopwatch')resetSW();else if(mode==='interval')resetInterval();else if(mode==='multi')multiTimers.forEach(t=>resetMulti(t.id));else if(mode==='stack')resetStack()}});
+
+resetInterval();setTimer(25*60);renderStackList();resetStackRuntime();restoreRuntimeState();restoreStackRuntime();smartLoad();syncSmartFields();renderAll();syncNativeNumericInputs();updateWakeButton();updateNotificationButton();renderAutomation();setMode(mode);
+</script>
+</body>
+</html>
